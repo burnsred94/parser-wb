@@ -1,0 +1,7 @@
+export const urlCatalog =
+  'https://catalog.wb.ru/menu/v7/api?lang=ru&locale=by&country=by&location=by';
+
+  //'Minsk' "https://search.wb.ru/exactmatch/sng/common/v4/search?query=%D0%B4%D0%B6%D0%B8%D0%BD%D1%81%D1%8B&resultset=filters&appType=128&curr=rub&locale=by&lang=ru&dest=-59208&regions=1,4,22,30,31,33,40,48,66,68,69,70,80,83&reg=1&spp=0"
+  //Москва  "https://search.wb.ru/exactmatch/ru/common/v4/search?appType=1&couponsGeo=12,3,18,15,21&curr=rub&dest=-1257786&emp=0&lang=ru&locale=ru&pricemarginCoeff=1.0&query=%D0%B4%D0%B6%D0%B8%D0%BD%D1%81%D1%8B&reg=0&regions=80,64,38,4,83,33,68,70,69,30,86,75,40,1,22,66,31,48,110,71&resultset=filters&spp=0&suppressSpellcheck=false"
+  //SPB "https://search.wb.ru/exactmatch/ru/common/v4/search?appType=1&couponsGeo=12,7,3,6,5,18,21&curr=rub&dest=-1198679&emp=0&filters=xsubject&lang=ru&locale=ru&pricemarginCoeff=1.0&query=%D0%B4%D0%B6%D0%B8%D0%BD%D1%81%D1%8B&reg=0&regions=80,64,38,4,83,33,68,70,69,30,86,40,1,22,66,31,48&resultset=filters&spp=0
+  //Ворожен https://search.wb.ru/exactmatch/ru/common/v4/search?appType=1&couponsGeo=12,7,3,6,18,21&curr=rub&dest=12358288&emp=0&filters=xsubject&lang=ru&locale=ru&pricemarginCoeff=1.0&query=%D0%B4%D0%B6%D0%B8%D0%BD%D1%81%D1%8B&reg=0&regions=80,64,38,4,83,33,68,70,69,30,86,40,1,22,66,31,48,110&resultset=filters&spp=0
