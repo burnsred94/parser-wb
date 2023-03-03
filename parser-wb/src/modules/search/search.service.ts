@@ -1,9 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import axios from 'axios';
-import { KeyOptimazationData } from 'src/interfaces/search.interfaces';
-import { Key } from 'src/keys-generator/intrerfaces/key.interface';
-import { KeysGeneratorService } from 'src/keys-generator/keys-generator.service';
-import { Keys } from 'src/keys-generator/schemas/key.schema';
+import { KeysGeneratorService } from 'src/modules/keys-generator/keys-generator.service';
 import { removeDuplicates } from 'src/utils/removeDuplicates'; 
 import { Article } from './interfaces/key-wb.interface';
 

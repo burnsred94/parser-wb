@@ -3,8 +3,8 @@ import { InjectModel } from '@nestjs/mongoose';
 import { readFileSync } from 'fs';
 import { Model } from 'mongoose';
 import { parse } from 'papaparse';
-import { CategoryService } from 'src/catalog/catalog.service';
-import { SubCategoryService } from 'src/sub-category/sub-category.service';
+import { CategoryService } from 'src/modules/catalog/catalog.service';
+import { SubCategoryService } from 'src/modules/sub-category/sub-category.service';
 import { Key } from './intrerfaces/key.interface';
 import { Keys, KeysDocumnet } from './schemas/key.schema';
 

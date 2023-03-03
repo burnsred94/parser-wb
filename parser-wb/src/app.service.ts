@@ -1,12 +1,11 @@
-import { Injectable, Type } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import axios from 'axios';
-import { CategoryService } from './catalog/catalog.service';
+import { CategoryService } from './modules/catalog/catalog.service';
 import { KeyOptimazationData, ParseArticle } from './interfaces/search.interfaces';
-import { KeysGeneratorService } from './keys-generator/keys-generator.service';
-import { SubCategoryService } from './sub-category/sub-category.service';
-import { SearchService } from './search/search.service';
-import { Key } from './keys-generator/intrerfaces/key.interface';
-import { Keys } from './keys-generator/schemas/key.schema';
+import { KeysGeneratorService } from './modules/keys-generator/keys-generator.service';
+import { SubCategoryService } from './modules/sub-category/sub-category.service';
+import { SearchService } from './modules/search/search.service';
+import { Key } from './modules/keys-generator/intrerfaces/key.interface';
 import { Types } from 'mongoose';
 
 
@@ -25,6 +24,8 @@ export class AppService {
   }
 
   async search(dto) {
+
+    
 
     const parse = await this.parseStringArticles(dto.article)
     const data = await this.getData(parse)
@@ -148,11 +149,8 @@ export class AppService {
       let i = 0
 
       if (status) {  
-        console.log('status: true')
           pr.push(this.searchService.search(data, Number(article)))
-
       } else {
-        console.log('status: false')
         while (data?.length > i) {
           i += 1
           pr.push(this.searchService.search(data[i], Number(article)))
@@ -160,11 +158,9 @@ export class AppService {
 
       }
 
-      console.log(pr)
       const result = await Promise.all(pr)
 
       return result
-
     } catch (e) {
 
     }

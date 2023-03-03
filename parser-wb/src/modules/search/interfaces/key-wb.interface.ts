@@ -1,4 +1,4 @@
-import { Key } from "src/keys-generator/intrerfaces/key.interface";
+import { Key } from "src/modules/keys-generator/intrerfaces/key.interface";
 
 export interface KeyWb extends Key {
     position: number;

@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose from "mongoose";
-import { Category } from "src/catalog/schemas/category.schemas";
-import { Keys } from "src/keys-generator/schemas/key.schema";
+import { Keys } from "src/modules/keys-generator/schemas/key.schema";
+import { Category } from "src/modules/catalog/schemas/category.schemas";
 
 export type SubCategoryDocumnet = mongoose.HydratedDocument<SubCategory>
 

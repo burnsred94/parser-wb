@@ -1,5 +1,5 @@
-import { Key } from "src/keys-generator/intrerfaces/key.interface";
-import { Keys } from "src/keys-generator/schemas/key.schema";
+import { Key } from "src/modules/keys-generator/intrerfaces/key.interface";
+import { Keys } from "src/modules/keys-generator/schemas/key.schema";
 
 export interface ParseArticle {
     vol: string;

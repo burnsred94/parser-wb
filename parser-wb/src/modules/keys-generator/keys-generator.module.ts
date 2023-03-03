@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { CategoryModule } from 'src/catalog/category.module';
-import { SubCategoryModule } from 'src/sub-category/sub-category.module';
+import { CategoryModule } from 'src/modules/catalog/category.module';
+import { SubCategoryModule } from 'src/modules/sub-category/sub-category.module';
 import { KeysGeneratorService } from './keys-generator.service';
 import { Keys, KeysSchema } from './schemas/key.schema';
 
