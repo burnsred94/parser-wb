@@ -1,0 +1,72 @@
+{
+  "sessions": [
+    {
+      "id": "183119364:183119364",
+      "data": {
+        "__scenes": {},
+        "state": "null",
+        "confirm": false,
+        "copywriting_data": {
+          "description": "описание эскпандера для",
+          "keywords": "",
+          "name": "экспандер",
+          "tickDescription": true,
+          "tickKeywords": false,
+          "tickName": true
+        }
+      }
+    },
+    {
+      "id": "671646655:671646655",
+      "data": {
+        "__scenes": {},
+        "state": "copywriter",
+        "copywriting_data": {
+          "description": "Детский пердёж,экологический чистый",
+          "keywords": "Пахнет цветами",
+          "name": "Пердёж детский",
+          "tickDescription": true,
+          "tickKeywords": true,
+          "tickName": true
+        }
+      }
+    },
+    {
+      "id": "1306170951:1306170951",
+      "data": {
+        "__scenes": {},
+        "state": "null",
+        "copywriting_data": {
+          "description": "для детей",
+          "keywords": "красная, макака",
+          "name": "Жопа",
+          "tickDescription": true,
+          "tickKeywords": true,
+          "tickName": true
+        }
+      }
+    },
+    {
+      "id": "1240139219:1240139219",
+      "data": {
+        "__scenes": {},
+        "state": "null"
+      }
+    },
+    {
+      "id": "54452505:54452505",
+      "data": {
+        "__scenes": {},
+        "state": "null",
+        "copywriting_data": {
+          "description": "для взрослых, усилие сжатия 200кг, резиновый,",
+          "keywords": "резиновый, шар, тренировка запястий, сила хвата, профилактика тунельного синдрома",
+          "name": "экспандер кистевой",
+          "tickDescription": true,
+          "tickKeywords": true,
+          "tickName": true
+        }
+      }
+    }
+  ]
+}

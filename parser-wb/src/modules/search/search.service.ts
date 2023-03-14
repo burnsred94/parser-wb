@@ -1,13 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import axios from 'axios';
-import { KeysGeneratorService } from 'src/modules/keys-generator/keys-generator.service';
-import { removeDuplicates } from 'src/utils/removeDuplicates'; 
+import { GotService } from '@t00nday/nestjs-got';
 import { Article } from './interfaces/key-wb.interface';
 
 @Injectable()
 export class SearchService {
 
-    constructor(private readonly keyService: KeysGeneratorService){}
+    constructor(private readonly gotService: GotService){}
 
 
     private async fetchPage(page: number, article: Article, code: string): Promise<{
@@ -17,7 +15,8 @@ export class SearchService {
     }> {
         try {
             const searchUrl = `https://search.wb.ru/exactmatch/sng/common/v4/search?query=${code}&resultset=catalog&limit=100&sort=popular&page=${page}&appType=128&curr=byn&locale=by&lang=ru&dest=-59208&regions=1,4,22,30,31,33,40,48,66,68,69,70,80,83&emp=0&reg=1&pricemarginCoeff=1.0&offlineBonus=0&onlineBonus=0&spp=0`
-            const { data: payload } = await axios.get(searchUrl)
+            const response = await this.gotService.gotRef(searchUrl)
+             const payload = JSON.parse(response.body)
             const result = payload.data.products.findIndex(product => product.id === article)
 
             return {
@@ -38,17 +37,15 @@ export class SearchService {
 
         for (const item of keys) {
             const code = encodeURIComponent(item?.key)
-            console.log(article)
 
             const data =
                 [
                     this.fetchPage(1, article, code),
                     this.fetchPage(2, article, code),
                     this.fetchPage(3, article, code),
-                    this.fetchPage(4, article, code),
-                    this.fetchPage(5, article, code),
                 ]
 
+                console.log(data)
 
             const result = await Promise.all(data)
             
@@ -56,13 +53,13 @@ export class SearchService {
             if (check !== undefined) {
                 const positionResult = check.page > 1 ? check.result : ((check.page * check.count) - check.count) + (check.result + 1)
                 arr.push({ key: item.key, count: item.count, position: positionResult })
-                console.log( {key: item.key, count: item.count} )
+                console.log( {key: item.key, count: item.count, position: positionResult} )
             }
         }
 
-        const filterArrays = removeDuplicates(arr)
 
-        return filterArrays
+        return arr
     }
+
 }
 

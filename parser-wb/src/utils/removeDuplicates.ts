@@ -1,13 +1,14 @@
-export const removeDuplicates = (arr)  => {
+export const removeDuplicates = async (arr)  => {
 
     const result = [];
     const duplicatesIndices = [];
-
+    
     arr.forEach((current, index) => {
     
         if (duplicatesIndices.includes(index)) return;
     
         result.push(current);
+        console.log(result.length);
     
         for (let comparisonIndex = index + 1; comparisonIndex < arr.length; comparisonIndex++) {
         
@@ -18,9 +19,7 @@ export const removeDuplicates = (arr)  => {
             if (currentKeys.length !== comparisonKeys.length) continue;
             
             const currentKeysString = currentKeys.sort().join("").toLowerCase();
-            console.log(currentKeysString)
             const comparisonKeysString = comparisonKeys.sort().join("").toLowerCase();
-            console.log(comparisonKeysString);
             
             if (currentKeysString !== comparisonKeysString) continue;
             

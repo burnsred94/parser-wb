@@ -1,13 +1,16 @@
 import { Injectable } from '@nestjs/common';
-import axios from 'axios';
 import { CategoryService } from './modules/catalog/catalog.service';
-import { KeyOptimazationData, ParseArticle } from './interfaces/search.interfaces';
+import { KeyOptimazationData } from './interfaces/search.interfaces';
 import { KeysGeneratorService } from './modules/keys-generator/keys-generator.service';
 import { SubCategoryService } from './modules/sub-category/sub-category.service';
 import { SearchService } from './modules/search/search.service';
 import { Key } from './modules/keys-generator/intrerfaces/key.interface';
 import { Types } from 'mongoose';
-
+import { ArticleService } from './modules/article/article.service';
+import { getImageProduct, parseStringArticles, getData, removeDuplicates } from './utils';
+import { GetData } from './utils/interfaces/interfaces.getData';
+import { CheckData, ResultDataInDB } from './interfaces/app-interfaces/service-app.interface';
+import { uniqWith, chunk } from 'lodash'
 
 @Injectable()
 export class AppService {
@@ -15,147 +18,168 @@ export class AppService {
   constructor(
     private readonly keyService: KeysGeneratorService,
     private readonly searchService: SearchService,
-    private readonly catologService: CategoryService,
+    private readonly categoryService: CategoryService,
     private readonly subCategoryService: SubCategoryService,
+    private readonly articleService: ArticleService
   ) { }
 
   async findCategory(dto) {
-    return await this.catologService.findCategory(dto);
+    return await this.categoryService.findCategory(dto);
   }
 
   async search(dto) {
 
-    
+    const parse = await parseStringArticles(dto.article)
+    const data = await getData(parse)
 
-    const parse = await this.parseStringArticles(dto.article)
-    const data = await this.getData(parse)
-    const checkSubCategory = await this.subCategoryService.findByName(data.dataQuery.subj_name)
-    const img = await this.getImageProduct(dto.article)
-    
-    if (checkSubCategory !== null) {
-      const result = await this.dataKeysOptimization(checkSubCategory.keys, true, dto.article)
+    const checkDataInBd = await this.check(data, dto.article);
 
-      return {
-        article: dto.article,
-        img: img,
-        product: {
-          parentCategory: data.dataQuery.subj_root_name,
-          subCategory: data.dataQuery.subj_name,
-          name: data.dataQuery.imt_name,
-        },
-        keys: result
-      }
-    }else {
-      const category = await this.catologService.addCategory(data.dataQuery.subj_root_name);
-      const subCategory = await this.subCategoryService.addSubCategory({ name: data.dataQuery.subj_name, categories: category._id })
-      category.categories.push(subCategory)
+    if (checkDataInBd.category === null) {
+      console.log("Checking 1: ", checkDataInBd)
+      return await this.notCategory(data, dto.article);
+    }
+
+    if (checkDataInBd.category !== null && checkDataInBd.subCategory === null) {
+      console.log("Checking 2: ", checkDataInBd)
+      return await this.notSubCategory(data, dto.article, checkDataInBd.category);
+    }
+    
+    // if (checkDataInBd.category !== null && checkDataInBd.subCategory !== null && checkDataInBd.article === null) {
+    //   console.log("Checking 3: ", checkDataInBd)
+    //   return await this.notArticles(data, dto.article, checkDataInBd.category, checkDataInBd.subCategory);
+    // }
+
+  }
+  
+  private async check(data: GetData, aritcle: string): Promise<CheckData> {
+    const category = await this.categoryService.findByName(data.dataQuery.subj_root_name)
+    const subCategory = await this.categoryService.findByName(data.dataQuery.subj_name)
+    const article = await this.articleService.findByArticle(aritcle)
+
+    return {
+      category: category !== null ? category._id : null,
+      subCategory: subCategory !== null ? subCategory._id : null,
+      article: article !== null ? article._id : null
+    }
+  }
+
+  // Когда у нас есть эта категория есть подкатегория и нет артикула
+  // Когда у нас есть категория есть подкатегория и есть артикул
+  //
+
+  private async notCategory(data: GetData, article: string): Promise<ResultDataInDB> {
+    try {
+      const category = await this.categoryService.addCategory(data.dataQuery.subj_root_name);
+      const subCategory = await this.subCategoryService.addSubCategory({ name: data.dataQuery.subj_name, categories: category._id });
+      category.categories.push(subCategory);
       category.save()
 
-      const keys = await this.keyService.generatorKeys(data.dataQuery.description)
+      const keys = await this.keyService.generatorKeys(data.dataQuery.description);
+      const rmDuplicates = uniqWith(keys);
 
-      const optimazation: Key[] = await this.dataKeysOptimization(keys, false, dto.article)
-
+      const arrKey = chunk(rmDuplicates, 50)
+      const optimazation: Key[] = await this.dataKeysOptimization(arrKey, false, article);
       subCategory.save()
-      
-      const result = this.dataSubCategoryKeysUpdate(optimazation, subCategory._id)
+
+      const img = await getImageProduct(article)
+
+      const keysResult = await this.dataSubCategoryKeysUpdate(optimazation, subCategory._id)
+
 
       return {
-        article: dto.article,
+        article: article,
         img: img,
         product: {
           parentCategory: data.dataQuery.subj_root_name,
           subCategory: data.dataQuery.subj_name,
           name: data.dataQuery.imt_name,
+          keys: keysResult
         },
-        keys: result
       }
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  private async notSubCategory(data: GetData, article: string, categoryId: Types.ObjectId): Promise<ResultDataInDB> {
+    const subCategory = await this.subCategoryService.addSubCategory({ name: data.dataQuery.subj_name, categories: categoryId });
+    const category = await this.categoryService.findById(categoryId);
+    category.categories.push(subCategory)
+
+    const keys = await this.keyService.generatorKeys(data.dataQuery.description);
+    const rmDuplicates = uniqWith(keys)
+
+    const arrKey = chunk(rmDuplicates, 50)
+    const optimazation: Key[] = await this.dataKeysOptimization(arrKey, false, article);
+    subCategory.save()
+
+    const img = await getImageProduct(article)
+
+    const keysResult = await this.dataSubCategoryKeysUpdate(optimazation, subCategory._id)
+
+    return {
+      article: article,
+      img: img,
+      product: {
+        parentCategory: data.dataQuery.subj_root_name,
+        subCategory: data.dataQuery.subj_name,
+        name: data.dataQuery.imt_name,
+        keys: keysResult
+      },
+    }
+  }
+
+  private async notArticles(data: GetData, article: string, categoryId: Types.ObjectId, subCategoryId: Types.ObjectId): Promise<ResultDataInDB> {
+    await this.articleService.createArticle({article: article, sub_category: subCategoryId, category: categoryId});
+    
+    const { keys } = await this.subCategoryService.findById(subCategoryId);
+    const generateKeys = await this.keyService.generatorKeys(data.dataQuery.description);
+    const allKeys = keys.concat(generateKeys);
+    const rmDuplicates = await removeDuplicates(allKeys.flat())
+
+    const keysResult = await this.dataKeysOptimization(rmDuplicates, false, article);
+
+    const img = await getImageProduct(article)
+
+    return {
+      article: article,
+      img: img,
+      product: {
+        parentCategory: data.dataQuery.subj_root_name,
+        subCategory: data.dataQuery.subj_name,
+        name: data.dataQuery.imt_name,
+        keys: keysResult
+      },
+    }
+  }
+
+  private async dataSubCategoryKeysUpdate(data: Key[], id: Types.ObjectId) {
+    try {
+      data.flat().forEach(async (keyData) => {
+        const key = await this.keyService.addKeys({ key: keyData.key, count: keyData.count })
+        await this.subCategoryService.updateKeys(id, key._id)
+      })
+
+      return data.flat()
+    } catch (e) {
 
     }
-
   }
 
-
-  private async getData(parse: ParseArticle) {
-    const dataBase = 11
-    const data = [];
-    let image;
-
-    for (let i = 1; i < dataBase; i++) {
-      try {
-        if (i < 10) {
-          const iterator = '0' + String(i);
-          const urlDataBase = `https://basket-${iterator}.wb.ru/vol${parse.vol}/part${parse.part}/${parse.article}/info/ru/card.json`;
-          const dataCard = await axios.get(urlDataBase)
-
-          if (dataCard.data !== undefined) {
-            data.push(dataCard.data)
-            break
-          }
-
-        } else {
-          const urlDataBase = `https://basket-${i}.wb.ru/vol${parse.vol}/part${parse.part}/${parse.article}/info/ru/card.json`;
-          const dataCard = await axios.get(urlDataBase)
-
-          if (dataCard.data !== undefined) {
-            data.push(dataCard.data)
-            break
-          }
-        }
-
-      } catch (e) {
-        continue
-      }
-    }
-
-    return { dataQuery: data[0], img: image }
-
-  }
-
-  async getImageProduct(articleId: string) {
-    const parse = await this.parseStringArticles(articleId)
-
-    for (let i = 0; i <= 10; i++) {
-      const iterator = i < 10 ? '0' + String(i) : i;
-      try {
-        const utlImg = `https://basket-${iterator}.wb.ru/vol${parse.vol}/part${parse.part}/${parse.article}/images/big/1.jpg`;
-        const img = await axios.get(utlImg)
-        if (img.status === 200) {
-          return utlImg
-        }
-      } catch (e) {
-        continue
-      }
-
-    }
-
-  }
-
-  private async dataSubCategoryKeysUpdate(data:Key[] , id: Types.ObjectId) {
-      try {
-        data.flat().forEach(async(keyData) => {
-          const key = await this.keyService.addKeys({ key: keyData.key, count: keyData.count })
-          await this.subCategoryService.updateKeys(id, key._id)
-        })
-
-        return data.flat()
-      }catch (e) {
-
-      }
-  }
-
-  private async dataKeysOptimization(data: KeyOptimazationData , status: boolean, article?: string): Promise<Key[]> {
+  private async dataKeysOptimization(data: KeyOptimazationData, status: boolean, article?: string): Promise<Key[]> {
     try {
       const pr = []
       let i = 0
+      console.log(data.length)
 
-      if (status) {  
-          pr.push(this.searchService.search(data, Number(article)))
+      if (status) {
+        pr.push(this.searchService.search(data, Number(article)))
       } else {
         while (data?.length > i) {
+          console.log("Итереация", i)
           i += 1
           pr.push(this.searchService.search(data[i], Number(article)))
         }
-
       }
 
       const result = await Promise.all(pr)
@@ -165,52 +189,4 @@ export class AppService {
 
     }
   }
-
-  private async parseStringArticles(data: string): Promise<ParseArticle> {
-    switch (data !== undefined) {
-      case data.length === 4:
-        return {
-          vol: '0',
-          part: data.substring(0, 1),
-          article: data
-        }
-      case data.length === 5:
-        return {
-          vol: '0',
-          part: data.substring(0, 2),
-          article: data
-        }
-      case data.length === 6:
-        return {
-          vol: data.substring(0, 1),
-          part: data.substring(0, 3),
-          article: data
-        }
-      case data.length === 7:
-        return {
-          vol: data.substring(0, 2),
-          part: data.substring(0, 4),
-          article: data
-        }
-      case data.length === 8:
-        return {
-          vol: data.substring(0, 3),
-          part: data.substring(0, 5),
-          article: data
-        }
-      case data.length === 9:
-        return {
-          vol: data.substring(0, 4),
-          part: data.substring(0, 6),
-          article: data
-        }
-      case data.length === 10:
-        return {
-          vol: data.substring(0, 5),
-          part: data.substring(0, 7),
-          article: data
-        }
-    }
-  }
-
 }

@@ -14,6 +14,17 @@ services:
       ports:
         - "3000:3000"
 
+    bot-ai:
+      container_name: bot-ai
+      build:
+        context: ./bot-ai
+      restart: always
+      volumes: 
+        - ./bot-ai:/usr/src/app
+        - /usr/src/app/node_modules
+      ports: 
+        - "5000:5000"
+
     mongo:
       image: mongo
       container_name: mongo

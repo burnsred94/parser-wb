@@ -8,6 +8,8 @@ import { KeysGeneratorModule } from './modules/keys-generator/keys-generator.mod
 import { SearchModule } from './modules/search/search.module';
 import { CategoryModule } from './modules/catalog/category.module';
 import { SubCategoryModule } from './modules/sub-category/sub-category.module';
+import { ArticleModule } from './modules/article/article.module';
+import { GotModule } from '@t00nday/nestjs-got';
 
 @Module({
   imports: [ConfigModule.forRoot({
@@ -18,7 +20,9 @@ import { SubCategoryModule } from './modules/sub-category/sub-category.module';
   KeysGeneratorModule,
   SearchModule,
   CategoryModule,
-  SubCategoryModule
+  SubCategoryModule,
+  ArticleModule,
+  GotModule,
 ],
   controllers: [AppController],
   providers: [AppService, SearchService],

@@ -1,0 +1,2 @@
+export const captionData  = `Рады приветствовать в сервисе <b>AI-копирайтинга</b> от <a href="https://sellershub.ru/?utm_medium=smm&utm_source=tg&utm_campaign=bot_ai&utm_term=bot_button&utm_content=1">Sellershub.ru</a>\n\nСервис использует <b>искусственный интеллект</b> для написания SEO-текста для описания товара <b>используя ваши ключи</b> для товара.\n\nМы обучаем нашу модель на базе товаров Wildberries`
+export const titleMenu = `Чтобы начать пользоваться ботом, зарегистрируйтесь.\n Выберите необходимый запрос`
