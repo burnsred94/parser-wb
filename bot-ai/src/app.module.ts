@@ -27,7 +27,7 @@ const sessions = new LocalSession({
   imports: [
 
     TelegrafModule.forRoot({
-      token: '6230430443:AAGoS3eiv1PEIpoJBHZskL6A5y0ZU375Abs',
+      token: '6054044696:AAFGvQUnf1ka-lSDRiM1CY0Y_Cy6VymwBA0',
       middlewares:[sessions]
     }),
     ConfigModule.forRoot({
