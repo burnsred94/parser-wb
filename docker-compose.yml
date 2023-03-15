@@ -21,6 +21,7 @@ services:
         dockerfile: ./Dockerfile
         target: development
       restart: unless-stopped
+      command: npm run start:dev
       volumes: 
         - ./bot-ai:/usr/src/app
         - /usr/src/app/node_modules
