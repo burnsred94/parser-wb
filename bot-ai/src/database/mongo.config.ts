@@ -9,7 +9,7 @@ export const getMongoconfig =  (configService:ConfigService):MongooseModuleOptio
 }
 
 const getMongoConnectUri = (configService:ConfigService) => {
-    const uri= `mongo://${configService.get('MONGO_INITDB_ROOT_USERNAME')}:${configService.get('MONGO_INITDB_ROOT_PASSWORD')}@${configService.get('HOST_MONGO_DB')}:${Number(configService.get('MONGO_DB_PORT'))}`
+    const uri= `mongodb://${configService.get('MONGO_INITDB_ROOT_USERNAME')}:${configService.get('MONGO_INITDB_ROOT_PASSWORD')}@${configService.get('HOST_MONGO_DB')}:${Number(configService.get('MONGO_DB_PORT'))}`
     return uri
 }
 
