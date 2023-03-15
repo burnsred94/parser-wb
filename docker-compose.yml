@@ -18,7 +18,9 @@ services:
       container_name: bot-ai
       build:
         context: ./bot-ai
-      restart: always
+        dockerfile: ./Dockerfile
+        target: development
+      restart: unless-stopped
       volumes: 
         - ./bot-ai:/usr/src/app
         - /usr/src/app/node_modules
