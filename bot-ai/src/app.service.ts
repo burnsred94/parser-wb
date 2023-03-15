@@ -21,7 +21,6 @@ export class AppService {
   async start(@Ctx() ctx: TelegrafContext) {
     ctx.session.state = null;
     const init = await this.initializerService.confirmInit(ctx);
-    
     const link = path.join(__dirname, '../public/Ad_Banner.png')
     const sourceImg = fs.createReadStream(link)
 

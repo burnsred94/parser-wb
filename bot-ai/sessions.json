@@ -7,11 +7,11 @@
         "state": "null",
         "confirm": false,
         "copywriting_data": {
-          "description": "описание эскпандера для",
-          "keywords": "",
-          "name": "экспандер",
+          "description": "sds",
+          "keywords": "Рады приветствовать вас сервисе AI-копирайтинга от Sellershub.ru\n\nСервис использует искусственный интеллект для написания SEO-текста для описания товара используя ваши ключи для товара.\n\nМы обучаем нашу модель на базе товаров Wildberries",
+          "name": "sds",
           "tickDescription": true,
-          "tickKeywords": false,
+          "tickKeywords": true,
           "tickName": true
         }
       }
@@ -20,7 +20,7 @@
       "id": "671646655:671646655",
       "data": {
         "__scenes": {},
-        "state": "copywriter",
+        "state": null,
         "copywriting_data": {
           "description": "Детский пердёж,экологический чистый",
           "keywords": "Пахнет цветами",
@@ -62,6 +62,43 @@
           "description": "для взрослых, усилие сжатия 200кг, резиновый,",
           "keywords": "резиновый, шар, тренировка запястий, сила хвата, профилактика тунельного синдрома",
           "name": "экспандер кистевой",
+          "tickDescription": true,
+          "tickKeywords": true,
+          "tickName": true
+        }
+      }
+    },
+    {
+      "id": "629558387:629558387",
+      "data": {
+        "__scenes": {},
+        "state": "null",
+        "copywriting_data": {
+          "description": "",
+          "keywords": "",
+          "name": "",
+          "tickDescription": false,
+          "tickKeywords": false,
+          "tickName": false
+        }
+      }
+    },
+    {
+      "id": "328019609:328019609",
+      "data": {
+        "__scenes": {},
+        "state": "null"
+      }
+    },
+    {
+      "id": "2051974028:2051974028",
+      "data": {
+        "__scenes": {},
+        "state": "null",
+        "copywriting_data": {
+          "description": "Для сада",
+          "keywords": "Зелёная",
+          "name": "Бордюрная лента",
           "tickDescription": true,
           "tickKeywords": true,
           "tickName": true

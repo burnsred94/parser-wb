@@ -46,16 +46,16 @@ export class InitializerService {
         const { username } = <{ username: string }>ctx.message.chat;
         const { first_name } = ctx.message.from
 
-        if (username) {
+
             const user = await this.userService.findByTelegram(username);
-            const check = user ? true : await this.getUserToApi(username);
-            return keyboardsInit(check, first_name)
-        }
+            const check = user ? true : await this.getUserToApi(username)
+            return check ? keyboardsInit(check, first_name) : keyboardsInit(check, first_name)
     }
 
     async getUserToApi(telegramName: string) {
         const api_url = await this.configService.get('API_URL')
         const user = await axios.post(`${api_url}/api/v1/verify/tg`, { tg: `https://t.me/${telegramName}` });
+        console.log(user.data)
         const { data } = user.data;
         if (data) {
             return true;

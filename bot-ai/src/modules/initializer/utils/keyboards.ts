@@ -15,18 +15,20 @@ export const keyboardsInit = async (confirm: boolean, user?: string) => {
                 },
             }
         }
-    }
-    return {
-        message: 'Чтобы начать пользоваться ботом, зарегистрируйтесь.\nВыберите необходимый запрос',
-        keyboard: {
-            reply_markup: {
-                inline_keyboard: [
-                    [{ text: "📑 Регистрация", callback_data: 'register' }],
-                    [{ text: "🤝 Поддержка", callback_data: 'support' }],
-                    [{ text: "💬 Наши каналы и чаты", callback_data: 'chats_and_chanels' }]
-                ]
+    } else {
+        return {
+            message: 'Чтобы начать пользоваться ботом, зарегистрируйтесь.\nВыберите необходимый запрос',
+            keyboard: {
+                reply_markup: {
+                    inline_keyboard: [
+                        [{ text: "📑 Регистрация", callback_data: 'register' }],
+                        [{ text: "🤝 Поддержка", callback_data: 'support' }],
+                        [{ text: "💬 Наши каналы и чаты", callback_data: 'chats_and_chanels' }]
+                    ]
+                }
             }
         }
+
     }
 }
 
