@@ -17,4 +17,8 @@ export class UserService {
         return await this._userRepository.findOne({ telegramUser })
     }
 
+    async updateUser(data) {
+        return await this._userRepository.findOneAndUpdate({ telegramUser: data.telegramUser }, {confirmed: data.confirmed})
+    }
+
 }

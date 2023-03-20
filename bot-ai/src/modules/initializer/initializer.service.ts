@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import axios from 'axios';
 import { EMAIL_REGEXP } from 'src/constants/constants';
-import { Action, TelegrafContext } from 'src/interfaces/telegraf-context.interfaces';
+import { Action, StatusUserBot, TelegrafContext } from 'src/interfaces/telegraf-context.interfaces';
 import { AuthService } from '../auth/auth.service';
 import { UserService } from '../user/user.service';
 import { IRegisterInit } from './interfaces/register-init.interfaces';
@@ -28,10 +28,12 @@ export class InitializerService {
                     state: Action.DEFAULT
                 }
             } else {
+                ctx.session.statusUser = StatusUserBot['REGISTERED_BOT'];
+
                 return {
                     message: `🎉Поздравляем ты успешно зарегистрировался!\nТебе осталось только подтвердить свою почту.\n\nТвой почта: ${text}\nПароль: <b>${dataRegister.pass}</b>\n\nНаши сервисы: 
                           `,
-                    state: Action.DEFAULT
+                    state: Action.REGISTER_SUCCESS
                 }
             }
         } else {
@@ -46,16 +48,12 @@ export class InitializerService {
         const { username } = <{ username: string }>ctx.message.chat;
         const { first_name } = ctx.message.from
 
-
-            const user = await this.userService.findByTelegram(username);
-            const check = user ? true : await this.getUserToApi(username)
-            return check ? keyboardsInit(check, first_name) : keyboardsInit(check, first_name)
+        return keyboardsInit(ctx.session.statusUser, first_name)   
     }
 
     async getUserToApi(telegramName: string) {
         const api_url = await this.configService.get('API_URL')
-        const user = await axios.post(`${api_url}/api/v1/verify/tg`, { tg: `https://t.me/${telegramName}` });
-        console.log(user.data)
+        const user = await axios.post(`${api_url}/verify/tg`, { tg: `https://t.me/${telegramName}` });
         const { data } = user.data;
         if (data) {
             return true;

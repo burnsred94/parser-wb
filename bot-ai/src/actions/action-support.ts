@@ -3,15 +3,25 @@ import * as path from "path";
 import * as fs from "fs"
 import { TelegrafContext } from "src/interfaces/telegraf-context.interfaces";
 import { Action as ActonEnum} from "src/interfaces/telegraf-context.interfaces";
+import { StatsService } from "src/modules/stats/stats.service";
 
 @Update()
 export class UpdateActionSupport {
+
+    constructor(private readonly statsService: StatsService){}
 
     @Action('support')
     async menu (ctx: TelegrafContext) {
         ctx.session.state = ActonEnum.DEFAULT;
         const link = path.join(__dirname, '../../public/photo_2023-03-14_15-01-39.jpg')
         const sourceImg = fs.createReadStream(link)
+
+        ctx.session.stats.support_button += 1;
+
+        await this.statsService.stats({
+            support_button: ctx.session.stats.support_button
+        })
+
 
         await ctx.replyWithPhoto(
             { source: sourceImg }, 

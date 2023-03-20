@@ -18,6 +18,11 @@ import { UpdateChats } from './actions/action-chats-and-chanels';
 import { UpdateReview } from './actions/action-review';
 import { UpdateTrackerPosition } from './actions/action-trakerposition';
 import { UpdateServices } from './actions/action-services';
+import { TaskManagerModule } from './modules/task-manager/task-manager.module';
+import { ScheduleModule } from '@nestjs/schedule';
+import { TaskManagerService } from './modules/task-manager/task-manager.service';
+import { StatsService } from './modules/stats/stats.service';
+import { StatsModule } from './modules/stats/stats.module';
 
 const sessions = new LocalSession({
   database: './sessions.json'
@@ -25,10 +30,10 @@ const sessions = new LocalSession({
 
 @Module({
   imports: [
-
+    ScheduleModule.forRoot(),
     TelegrafModule.forRoot({
       token: '6054044696:AAFGvQUnf1ka-lSDRiM1CY0Y_Cy6VymwBA0',
-      middlewares:[sessions]
+      middlewares: [sessions]
     }),
     ConfigModule.forRoot({
       isGlobal: true,
@@ -38,8 +43,23 @@ const sessions = new LocalSession({
     AuthModule,
     DatabaseModule,
     UserModule,
+    TaskManagerModule,
+    StatsModule,
   ],
   controllers: [AppController],
-  providers: [AppService, AuthService, UpdateRegister, InitializerService, UpdateAiCopyWrite, UpdateMenuCopyWrite, UpdateActionSupport, UpdateChats,UpdateReview, UpdateTrackerPosition, UpdateServices],
+  providers: [
+    AppService,
+    AuthService,
+    UpdateRegister,
+    InitializerService,
+    UpdateAiCopyWrite,
+    UpdateMenuCopyWrite,
+    UpdateActionSupport,
+    UpdateChats,
+    UpdateReview,
+    UpdateTrackerPosition,
+    UpdateServices,
+    TaskManagerService
+  ],
 })
-export class AppModule {}
+export class AppModule { }

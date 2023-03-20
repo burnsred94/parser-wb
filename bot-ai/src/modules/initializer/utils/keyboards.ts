@@ -1,7 +1,7 @@
-import { Action } from "src/interfaces/telegraf-context.interfaces"
+import { Action, StatusUserBot } from "src/interfaces/telegraf-context.interfaces"
 
-export const keyboardsInit = async (confirm: boolean, user?: string) => {
-    if (confirm) {
+export const keyboardsInit = async (confirm: StatusUserBot, user?: string) => {
+    if (confirm === StatusUserBot['REGISTERED_BOT'] || confirm === StatusUserBot['REGISTER_BOT_SITE']) {
         return {
             message: `Здраствуйте ${user}\nВоспользуйтесь нашими софтами\nдля генирации описанния карточки товара\nи отслеживанием позиции товара WB`,
             keyboard: {
