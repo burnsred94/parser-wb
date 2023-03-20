@@ -12,6 +12,7 @@ export class UpdateServices {
         ctx.session.state = ActonEnum.DEFAULT;
         const link = path.join(__dirname, '../../public/Avd Banner 20.png')
         const sourceImg = fs.createReadStream(link)
+        
         await ctx.replyWithPhoto(
             { source: sourceImg }, 
             { 
