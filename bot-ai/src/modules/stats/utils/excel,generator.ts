@@ -9,8 +9,6 @@ export class ExcelGenerator {
     async excelGenerate(json) {
         const workbook = new Excel.Workbook();
         const worksheet = workbook.addWorksheet('Stats');
-
-        console.log(json);
         
         worksheet.columns = [
             { header: 'Date', key: 'date' },
@@ -38,7 +36,7 @@ export class ExcelGenerator {
             })
         })
 
-        const File = await new Promise((resolve, reject) => {
+        const File = await new Promise((resolve) => {
 
             tmp.file({ detachDescriptor: true, prefix: 'stats', postfix: '.xlsx' ,mode: parseInt('0600', 8)}, async (err, file) => {
             if (err) {

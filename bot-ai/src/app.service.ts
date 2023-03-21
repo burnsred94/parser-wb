@@ -37,6 +37,10 @@ export class AppService {
 
     ctx.session.stats !== null ? null : await initState(ctx)
 
+    const { id } = ctx.message.from
+
+    console.log(id)
+
     const checkUserInDb = await this.userService.findByTelegram(ctx.session.user);
     const checkUserApi = await this.authService.authLogin(ctx.session.user);
 

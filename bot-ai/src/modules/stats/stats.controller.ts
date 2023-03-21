@@ -1,6 +1,7 @@
-import { Controller, Get, Header, Res } from '@nestjs/common';
+import { Body, Controller, Get, Header, Post, Res } from '@nestjs/common';
 import { StatsService } from './stats.service';
 import { Response } from 'express';
+import { StatsDto } from './dto/stats.dto';
 
 @Controller('stats')
 export class StatsController {
@@ -12,5 +13,10 @@ export class StatsController {
     async getMout(@Res() res: Response) {
         const xlsx = await this.statsService.getMouth();
         res.download(`${xlsx}`)
+    }
+
+    @Post('pull')
+    async pullStatsData(@Body() dto: StatsDto) {
+        return await this.statsService.pullStatsData(dto);
     }
 }

@@ -21,8 +21,8 @@ import { UpdateServices } from './actions/action-services';
 import { TaskManagerModule } from './modules/task-manager/task-manager.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { TaskManagerService } from './modules/task-manager/task-manager.service';
-import { StatsService } from './modules/stats/stats.service';
 import { StatsModule } from './modules/stats/stats.module';
+import { SessionsModule } from './modules/sessions/sessions.module';
 
 const sessions = new LocalSession({
   database: './sessions.json'
@@ -32,7 +32,7 @@ const sessions = new LocalSession({
   imports: [
     ScheduleModule.forRoot(),
     TelegrafModule.forRoot({
-      token: '6054044696:AAFGvQUnf1ka-lSDRiM1CY0Y_Cy6VymwBA0',
+      token: '6230430443:AAGoS3eiv1PEIpoJBHZskL6A5y0ZU375Abs',
       middlewares: [sessions]
     }),
     ConfigModule.forRoot({
@@ -45,6 +45,7 @@ const sessions = new LocalSession({
     UserModule,
     TaskManagerModule,
     StatsModule,
+    SessionsModule,
   ],
   controllers: [AppController],
   providers: [
@@ -59,7 +60,7 @@ const sessions = new LocalSession({
     UpdateReview,
     UpdateTrackerPosition,
     UpdateServices,
-    TaskManagerService
+    TaskManagerService,
   ],
 })
 export class AppModule { }
