@@ -18,8 +18,9 @@ export class StatsService {
 
     async stats(data?: IStats) {
         const stats = await this.getStats();
+        console.log(stats, this.date, new Date().getMinutes());
 
-        if (stats) {
+        if (stats !== null) {
             await this.updateStats(data);
         } else {
             await this._statsRepository.create(new Stats());

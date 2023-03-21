@@ -18,6 +18,7 @@ import { initState } from './utils/init-sesion-state';
 @Update()
 export class AppService {
   cronTasks: TaskManager[]
+  date = `${new Date().getFullYear()}-${new Date().getMonth() + 1}-${new Date().getDate()}`
 
   userId: number;
 
@@ -33,6 +34,10 @@ export class AppService {
 
   @Use()
   async middleware(ctx: TelegrafContext, next: () => Promise<void>) {
+
+    ctx.session.stats !== null ? null : await initState(ctx)
+
+    ctx.session.stats.date === null || ctx.session.stats.date !== this.date ? ctx.session.stats.date = this.date : ctx.session.stats.date = ctx.session.stats.date;
 
     const checkUserInDb = await this.userService.findByTelegram(ctx.session.user);
     const checkUserApi = await this.authService.authLogin(ctx.session.user);
@@ -57,6 +62,7 @@ export class AppService {
   @Start()
   async start(@Ctx() ctx: TelegrafContext) {
     ctx.session.stats ? null : await initState(ctx);
+
 
     this.userId = ctx.from.id;
     ctx.session.stats.start_bot += 1;

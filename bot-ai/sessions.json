@@ -7,12 +7,25 @@
         "state": "null",
         "confirm": false,
         "copywriting_data": {
-          "description": "sds",
-          "keywords": "Рады приветствовать вас сервисе AI-копирайтинга от Sellershub.ru\n\nСервис использует искусственный интеллект для написания SEO-текста для описания товара используя ваши ключи для товара.\n\nМы обучаем нашу модель на базе товаров Wildberries",
-          "name": "sds",
-          "tickDescription": true,
-          "tickKeywords": true,
-          "tickName": true
+          "description": "",
+          "keywords": "",
+          "name": "",
+          "tickDescription": false,
+          "tickKeywords": false,
+          "tickName": false
+        },
+        "statusUser": 3,
+        "user": "ko909",
+        "stats": {
+          "date": "2023-3-21",
+          "start_bot": 1,
+          "channels_button": 0,
+          "success_registration": 0,
+          "support_button": 1,
+          "start_generation_button": 0,
+          "regenerate_button": 0,
+          "track_position_button": 3,
+          "reviews_or_copyright": []
         }
       }
     },
