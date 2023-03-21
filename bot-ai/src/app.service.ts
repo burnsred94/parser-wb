@@ -37,8 +37,6 @@ export class AppService {
 
     ctx.session.stats !== null ? null : await initState(ctx)
 
-    ctx.session.stats.date === null || ctx.session.stats.date !== this.date ? ctx.session.stats.date = this.date : ctx.session.stats.date = ctx.session.stats.date;
-
     const checkUserInDb = await this.userService.findByTelegram(ctx.session.user);
     const checkUserApi = await this.authService.authLogin(ctx.session.user);
 
