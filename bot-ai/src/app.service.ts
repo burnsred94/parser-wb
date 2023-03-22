@@ -11,6 +11,8 @@ import { Cron } from '@nestjs/schedule';
 import { AuthService } from './modules/auth/auth.service';
 import { StatsService } from './modules/stats/stats.service';
 import { initState } from './utils/init-sesion-state';
+import { SessionsService } from './modules/sessions/sessions.service';
+import { Session } from './modules/sessions/schemas/sessions.schema';
 
 
 
@@ -20,14 +22,15 @@ export class AppService {
   cronTasks: TaskManager[]
   date = `${new Date().getFullYear()}-${new Date().getMonth() + 1}-${new Date().getDate()}`
 
-  userId: number;
+
 
   constructor(
     private readonly initializerService: InitializerService,
     private readonly userService: UserService,
     private readonly authService: AuthService,
     private readonly taskManagerService: TaskManagerService = new TaskManagerService(),
-    private readonly statsService: StatsService
+    private readonly statsService: StatsService,
+    private readonly sessionService: SessionsService,
   ) {
     this.cronTasks = [];
   }
@@ -35,11 +38,11 @@ export class AppService {
   @Use()
   async middleware(ctx: TelegrafContext, next: () => Promise<void>) {
 
+
     ctx.session.stats !== null ? null : await initState(ctx)
 
     const { id } = ctx.message.from
 
-    console.log(id)
 
     const checkUserInDb = await this.userService.findByTelegram(ctx.session.user);
     const checkUserApi = await this.authService.authLogin(ctx.session.user);
@@ -63,17 +66,32 @@ export class AppService {
 
   @Start()
   async start(@Ctx() ctx: TelegrafContext) {
-    ctx.session.stats ? null : await initState(ctx);
+    const { id, username } = ctx.message.from
+
+    const findUserTelegram = await this.userService.findByTelegramId(id);
+
+    if (findUserTelegram) {
+      const findSessionTelegram = await this.sessionService.findOne(id);
+
+     
+      const session = new Session(id, findUserTelegram);
+
+      findSessionTelegram ?
+        await this.sessionService.delete(id) && await this.sessionService.createSession(session) :
+        await this.sessionService.createSession(session)
+
+    } else {
+      const user = await this.userService.create({ telegramUserId: id, username: username });
+
+      const session = new Session(ctx.message.from.id, user)
+      await this.sessionService.createSession(session);
+    }
 
 
-    this.userId = ctx.from.id;
-    ctx.session.stats.start_bot += 1;
+    
 
-    ctx.session.stats.start_bot > 1 ? null : await this.statsService.stats({ start_bot: ctx.session.stats.start_bot })
-
-
-    const task = this.taskManagerService.fabric(this.userId)
-    this.cronTasks.push(task);
+    // const task = this.taskManagerService.fabric(this.userId)
+    // this.cronTasks.push(task);
 
     const init = await this.initializerService.confirmInit(ctx);
 

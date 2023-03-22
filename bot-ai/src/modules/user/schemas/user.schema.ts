@@ -15,6 +15,9 @@ export class User {
     @Prop({type: "string"})
     password: string;
 
+    @Prop({type: Number})
+    telegramUserId: number;
+
     @Prop({type: "string"})
     telegramUser: string;
 

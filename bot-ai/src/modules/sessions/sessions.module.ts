@@ -5,6 +5,7 @@ import { SessionsService } from './sessions.service';
 
 @Module({
     imports: [MongooseModule.forFeature([{ name: 'Session', schema: SessionSchema }])],
-    providers: [SessionsService]
+    providers: [SessionsService],
+    exports: [SessionsService]
 })
 export class SessionsModule {}

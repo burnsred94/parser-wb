@@ -9,7 +9,7 @@ export class UserService {
 
     constructor(@InjectModel(User.name) private _userRepository: Model<UserDocument>){}
 
-    async create(user: IUser) {
+    async create(user: Partial<User>) {
          return await this._userRepository.create(user)
     }
 
@@ -19,6 +19,10 @@ export class UserService {
 
     async updateUser(data) {
         return await this._userRepository.findOneAndUpdate({ telegramUser: data.telegramUser }, {confirmed: data.confirmed})
+    }
+
+    async findByTelegramId (telegramId: User['telegramUserId']) {
+        return await this._userRepository.findOne({ telegramId })
     }
 
 }
