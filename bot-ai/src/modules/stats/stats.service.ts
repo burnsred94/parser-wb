@@ -49,7 +49,7 @@ export class StatsService {
                 }
             )
         } else {
-
+            console.log(data);
             await this._statsRepository.updateOne({
                 date: this.date
             },

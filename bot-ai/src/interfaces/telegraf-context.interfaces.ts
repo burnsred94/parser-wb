@@ -1,18 +1,20 @@
 import { Context } from "telegraf";
 
 export enum Action {
-    REGISTER = 'register',
-    AI_COPYWRITER = 'copywriter',
-    SUPPORT = 'support',
-    CHAT_AND_CHANNELS = 'chatAndChannels',
-    REGISTER_SUCCESS = 'registerSuccess',
-    DEFAULT = 'null',
+    REGISTER,
+    AI_COPYWRITER,
+    SUPPORT,
+    LOGIN,
+    CHAT_AND_CHANNELS ,
+    REGISTER_SUCCESS,
+    REVIEW,
+    DEFAULT,
+    SERVICES,
+    LOGOUT,
 }
 
 export enum StatusUserBot {
     NOT_REGISTERED,
-    NOT_REGISTERED_BOT,
-    REGISTERED,
     REGISTERED_BOT,
     REGISTER_BOT_SITE
 }

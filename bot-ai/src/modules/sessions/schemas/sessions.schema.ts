@@ -3,7 +3,8 @@ import * as mongoose from "mongoose";
 import { Types } from "mongoose";
 import { Action, StatusUserBot } from "src/interfaces/telegraf-context.interfaces";
 import { User } from "src/modules/user/schemas/user.schema";
-import { Copywriting } from "./copywrite-data.schema";
+import { CopywritingService } from "./copywrite-data.schema";
+import { LoginSession } from "./session-login.schema";
 import { SessionStats } from "./sessions-stats.schema";
 
 
@@ -16,13 +17,14 @@ export type SessionDocument = mongoose.HydratedDocument<Session>
 export class Session {
     id: number
     sStats = new SessionStats().createStatsSession()
-    sCopywriting = new Copywriting().createCopywritingSession()
+    sCopywriting = new CopywritingService().createCopywritingSession()
+    sLogin = new LoginSession().createDataSetLogin()
 
     constructor(id: number, user: User){
         this.userId = id;
         this.user = user;
         this.confirmed = user.confirmed;
-        user.confirmed !== false ? this.statusUser = StatusUserBot.REGISTERED : this.statusUser = StatusUserBot.NOT_REGISTERED
+        user.confirmed !== false ? this.statusUser = StatusUserBot.REGISTERED_BOT : this.statusUser = StatusUserBot.NOT_REGISTERED
     }
 
     @Prop({type: mongoose.Schema.Types.ObjectId, ref: "User"})
@@ -31,8 +33,8 @@ export class Session {
     @Prop({ required: true, default: (`${new Date().getFullYear()}-${new Date().getMonth() + 1}-${new Date().getDate()}`) })
     date: string;
 
-    @Prop({ type: String, default: Action.DEFAULT, enum: Object.values(Action) })
-    state: string;
+    @Prop({ type: Number, default: Action.DEFAULT})
+    state: number;
 
     @Prop({ default: false })
     confirmed: boolean;
@@ -40,7 +42,7 @@ export class Session {
     @Prop({ type: Object })
     copywriting_data = this.sCopywriting;
 
-    @Prop({ type: String, enum: Object.values(StatusUserBot) })
+    @Prop({ type: Number, enum: StatusUserBot})
     statusUser: number;
 
     @Prop({ type: Number })
@@ -48,6 +50,9 @@ export class Session {
 
     @Prop({ type: Object })
     stats = this.sStats
+
+    @Prop({type: Object })
+    login = this.sLogin
 
 }
 

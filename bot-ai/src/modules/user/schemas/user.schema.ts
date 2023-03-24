@@ -15,6 +15,9 @@ export class User {
     @Prop({type: "string"})
     password: string;
 
+    @Prop({type: Number, default: 1500})
+    generateSymbol: number;
+
     @Prop({type: Number})
     telegramUserId: number;
 

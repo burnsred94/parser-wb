@@ -2,16 +2,23 @@ import { Action, Update } from "nestjs-telegraf";
 import * as path from "path";
 import * as fs from "fs"
 import { TelegrafContext } from "src/interfaces/telegraf-context.interfaces";
-import { Action as ActonEnum} from "src/interfaces/telegraf-context.interfaces";
+import { Action as ActionState } from "src/interfaces/telegraf-context.interfaces";
+import { SessionsService } from "src/modules/sessions/sessions.service";
 
 @Update()
 export class UpdateServices {
 
+    constructor(private readonly sessionService: SessionsService) {}
+
     @Action('services')
     async menu (ctx: TelegrafContext) {
-        ctx.session.state = ActonEnum.DEFAULT;
+        const {id} = ctx.from
+        
         const link = path.join(__dirname, '../../public/Avd Banner 20.png')
         const sourceImg = fs.createReadStream(link)
+    
+        const state = {state: ActionState.SERVICES}
+        await this.sessionService.updateOne(id, state)
         
         await ctx.replyWithPhoto(
             { source: sourceImg }, 
@@ -22,7 +29,7 @@ export class UpdateServices {
                     inline_keyboard: [
                         [{ text: "📈 Трекер позиций товара WB", callback_data: 'track_position' }],
                         [{ text: "🤖 Бот Каталога SellersHub", url: "https://t.me/sellershub_bot" }],
-                        [{ text: "📋 Вернутся в меню", callback_data: "menu" }, { text: "🤝 Поддержка", callback_data: "support" }]
+                        [{ text: "📋 Вернутся в меню", callback_data: "start" }, { text: "🤝 Поддержка", callback_data: "support" }]
                     ]
                 } 
             })

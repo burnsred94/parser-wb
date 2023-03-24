@@ -1,110 +1,139 @@
-import { Ctx, Message, On, Start, Update, Use } from 'nestjs-telegraf';
-import * as fs from 'fs';
-import * as path from 'path';
+import { Action, Command, Ctx, Message, On, Start, Update, Use } from 'nestjs-telegraf';
 
-import { Action, StatusUserBot, TelegrafContext } from './interfaces/telegraf-context.interfaces';
+import { Action as ActionState, StatusUserBot, TelegrafContext } from './interfaces/telegraf-context.interfaces';
 import { InitializerService } from './modules/initializer/initializer.service';
-import { keyboardsAction } from './modules/initializer/utils/keyboards';
 import { UserService } from './modules/user/user.service';
-import { TaskManager, TaskManagerService } from './modules/task-manager/task-manager.service';
-import { Cron } from '@nestjs/schedule';
 import { AuthService } from './modules/auth/auth.service';
 import { StatsService } from './modules/stats/stats.service';
-import { initState } from './utils/init-sesion-state';
 import { SessionsService } from './modules/sessions/sessions.service';
 import { Session } from './modules/sessions/schemas/sessions.schema';
+import { CopywritingService } from './modules/sessions/schemas/copywrite-data.schema';
+import { ValidatorService } from './modules/validator/validator.service';
+import { SessionStats } from './modules/sessions/schemas/sessions-stats.schema';
+import { LoginSession } from './modules/sessions/schemas/session-login.schema';
+import { Cron, CronExpression } from '@nestjs/schedule';
+import { ConfigService } from '@nestjs/config';
+import { Telegram } from 'telegraf';
+import * as path from 'path';
+import * as fs from 'fs';
 
 
 
 
 @Update()
 export class AppService {
-  cronTasks: TaskManager[]
   date = `${new Date().getFullYear()}-${new Date().getMonth() + 1}-${new Date().getDate()}`
-
+  copywriting = new CopywritingService().createCopywritingSession()
+  configService: ConfigService
+  bot: Telegram
 
 
   constructor(
     private readonly initializerService: InitializerService,
     private readonly userService: UserService,
     private readonly authService: AuthService,
-    private readonly taskManagerService: TaskManagerService = new TaskManagerService(),
+    // private readonly taskService: TaskManagerService,
     private readonly statsService: StatsService,
     private readonly sessionService: SessionsService,
+    private readonly validatorService: ValidatorService,
   ) {
-    this.cronTasks = [];
+    this.configService = new ConfigService();
+    this.bot = new Telegram(this.configService.get('TOKEN_DEV_TELEGRAM'));
   }
 
   @Use()
   async middleware(ctx: TelegrafContext, next: () => Promise<void>) {
-
-
-    ctx.session.stats !== null ? null : await initState(ctx)
-
-    const { id } = ctx.message.from
-
-
-    const checkUserInDb = await this.userService.findByTelegram(ctx.session.user);
-    const checkUserApi = await this.authService.authLogin(ctx.session.user);
-
-
-    if (!checkUserInDb) {
-      ctx.session.statusUser = StatusUserBot['NOT_REGISTERED'];
-    }
-
-    if (checkUserInDb && checkUserApi === StatusUserBot['REGISTERED_BOT']) {
-      ctx.session.statusUser = StatusUserBot['REGISTERED_BOT'];
-    }
-
-    if (ctx.session.statusUser === StatusUserBot['REGISTERED_BOT']) {
-      const user = await this.authService.authLogin(ctx.session.user);
-      ctx.session.statusUser = user
-    }
-
     await next();
   }
 
+  @Action('start')
   @Start()
   async start(@Ctx() ctx: TelegrafContext) {
-    const { id, username } = ctx.message.from
+    const { id, username } = ctx.message ? ctx.message.from : ctx.callbackQuery.from
 
+    
     const findUserTelegram = await this.userService.findByTelegramId(id);
-
+    
+    await this.statsService.stats({ start_bot: 1 })
+    
     if (findUserTelegram) {
       const findSessionTelegram = await this.sessionService.findOne(id);
+      
+      if (findSessionTelegram?.date === this.date && findSessionTelegram !== null) {
+        await this.sessionService.findOneAndUpdate(id, {
+          copywriting_data: this.copywriting,
+        })
+        
+        const init = await this.initializerService.initStartKeyboard(findSessionTelegram.statusUser)
+        
+        if (init) {
+          await ctx.reply(init.caption, {
+            parse_mode: 'HTML',
+            reply_markup: {
+              inline_keyboard: init.keyboard.reply_markup.inline_keyboard,
+            },
+            
+          })
+        }
+        
+      } else if (findSessionTelegram?.date !== this.date && findSessionTelegram !== null) {
+        const session = new Session(id, findUserTelegram);
 
-     
-      const session = new Session(id, findUserTelegram);
+        findSessionTelegram ?
+          await this.sessionService.delete(id) && await this.sessionService.createSession(session) :
+          await this.sessionService.createSession(session)
 
-      findSessionTelegram ?
-        await this.sessionService.delete(id) && await this.sessionService.createSession(session) :
-        await this.sessionService.createSession(session)
+        const init = await this.initializerService.initStartKeyboard(findSessionTelegram.statusUser)
+
+        if (init) {
+          await ctx.reply(init.caption, {
+            parse_mode: 'HTML',
+            reply_markup: {
+              inline_keyboard: init.keyboard.reply_markup.inline_keyboard,
+            },
+
+          })
+        }
+
+      } else {
+        const session = new Session(id, findUserTelegram);
+        await this.sessionService.createSession(session);
+
+        const init = await this.initializerService.initStartKeyboard(session.statusUser)
+
+        await this.userService.findByTelegramUserUpdateTelegramId(username, { telegramUserId: id, generateSymbol: 1500 })
+
+        if (init) {
+          await ctx.reply(init.caption, {
+            parse_mode: 'HTML',
+            reply_markup: {
+              inline_keyboard: init.keyboard.reply_markup.inline_keyboard,
+            },
+
+          })
+        }
+      }
+
 
     } else {
       const user = await this.userService.create({ telegramUserId: id, username: username });
 
       const session = new Session(ctx.message.from.id, user)
-      await this.sessionService.createSession(session);
-    }
+      const sessionInDb = await this.sessionService.createSession(session);
 
+      const init = await this.initializerService.initStartKeyboard(sessionInDb.statusUser);
 
-    
-
-    // const task = this.taskManagerService.fabric(this.userId)
-    // this.cronTasks.push(task);
-
-    const init = await this.initializerService.confirmInit(ctx);
-
-    const link = path.join(__dirname, '../public/Ad_Banner.png')
-    const sourceImg = fs.createReadStream(link)
-
-    await ctx.replyWithPhoto({ source: sourceImg }, {
-      caption: `Рады приветствовать в сервисе <b>AI-копирайтинга</b> от <a href="https://sellershub.ru/?utm_medium=smm&utm_source=tg&utm_campaign=bot_ai&utm_term=bot_button&utm_content=1">Sellershub.ru</a>\n\nСервис использует <b>искусственный интеллект</b> для написания SEO-текста для описания товара <b>используя ваши ключи</b> для товара.\n\nМы обучаем нашу модель на базе товаров Wildberries\n\n${init.message}`,
-      parse_mode: 'HTML',
-      reply_markup: {
-        inline_keyboard: init.keyboard.reply_markup.inline_keyboard
+      if (init) {
+        await ctx.replyWithPhoto({ source: init.img }, {
+          caption: init.caption,
+          parse_mode: 'HTML',
+          reply_markup: {
+            inline_keyboard: init.keyboard.reply_markup.inline_keyboard
+          }
+        });
       }
-    });
+
+    }
 
   }
 
@@ -112,96 +141,218 @@ export class AppService {
 
   @On('message')
   async getMessage(@Message('text') message: string, @Ctx() ctx: TelegrafContext) {
+    const { id } = ctx.message.from
 
-    if (ctx.session.state === 'register') {
-      const response = await this.initializerService.registerInit(ctx);
+    const findSessionTelegram = await this.sessionService.findOne(id);
 
-      response.state === Action['REGISTER_SUCCESS'] ? ctx.session.state = Action['REGISTER_SUCCESS'] : ctx.session.state = Action['REGISTER'];
+    if (findSessionTelegram.state === ActionState.REGISTER) {
+      try {
+        await this.validatorService.validateTypesString(message);
+        await this.validatorService.validateEmail(message);
 
-      if (response.state === Action['REGISTER_SUCCESS']) {
-        ctx.session.stats.success_registration += 1
-      }
+        const newRegister = await this.authService.register(message, id)
 
-      if (ctx.session.state === Action['REGISTER_SUCCESS'] && ctx.session.stats.success_registration > 0) {
-        await this.statsService.stats({
-          success_registration: ctx.session.stats.success_registration
-        })
-      }
-
-      const init = await this.initializerService.confirmInit(ctx);
+        if (newRegister) {
+          const state = { statusUser: StatusUserBot.REGISTERED_BOT };
+          await this.sessionService.updateOne(id, state)
 
 
-      const link = path.join(__dirname, '../public/Registration_success.png')
-      const sourceImg = fs.createReadStream(link)
+          const init = await this.initializerService.initStartKeyboard(state.statusUser);
 
+          if (init) {
+            await this.statsService.stats({ success_registration: 1 })
 
-      await ctx.replyWithPhoto({ source: sourceImg }, {
-        caption: response.message,
-        parse_mode: 'HTML',
-        reply_markup: init.keyboard.reply_markup,
-      });
-      ctx.session.state = response.state;
-    }
+            const stat = new SessionStats().getNewStatsSession({
+              ...findSessionTelegram.stats,
+              success_registration: 1
+            })
 
-    if (ctx.session.state === Action['AI_COPYWRITER']) {
-      ctx.session.state = Action['AI_COPYWRITER'];
+            await this.sessionService.updateStats(id, stat)
+            await this.sessionService.updateOne(id, { state: ActionState.REGISTER_SUCCESS })
 
-
-      const messageAndKeyboard = await keyboardsAction('AI_COPYWRITER');
-
-      const { tickDescription, tickKeywords, tickName } = ctx.session.copywriting_data
-
-      if (ctx.session.state === Action['AI_COPYWRITER'] && ctx.session.stats.start_generation_button === 0) {
-        ctx.session.stats.start_generation_button += 1
-
-        await this.statsService.stats({
-          start_generation_button: ctx.session.stats.start_generation_button
-        });
-      }
-
-      if (!tickName) {
-        ctx.session.copywriting_data.name = message
-        ctx.session.copywriting_data.tickName = true
-        await ctx.reply('<b>Введите описание товара</b>\n\n <i>например "\для детей и взрослых, демисезонная, черная\"</i>', {
-          parse_mode: 'HTML',
-        })
-      }
-
-      if (tickName && !tickDescription && !tickKeywords) {
-        ctx.session.copywriting_data.description = message
-        ctx.session.copywriting_data.tickDescription = true
-        await ctx.reply('<b>Введите ключевые слова</b>\n\n<i>цвет - желтый, размер - s, m, l, xl, застежка - молния, стильная и яркая</i>', {
-          parse_mode: 'HTML',
-        })
-      }
-
-      if (tickName && tickDescription && !tickKeywords) {
-        ctx.session.copywriting_data.keywords = message
-        ctx.session.copywriting_data.tickKeywords = true
-
-        await ctx.reply('Генерация может занять некоторе время... 🤞🏽')
-        const response = await this.initializerService.getAiDataBot(ctx);
-
-        if (response) {
-          if (ctx.session.stats.start_generation_button > 0) {
-            ctx.session.stats.regenerate_button += 1
-
-            await this.statsService.stats({
-              regenerate_button: ctx.session.stats.regenerate_button
+            await ctx.replyWithPhoto({ source: init.img }, {
+              caption: `${init.caption}\n\n<b>Ваша почта:</b>\n${newRegister.email}\n\n<b>Ваш пароль:</b>\n${newRegister.pass}`,
+              parse_mode: 'HTML',
+              reply_markup: {
+                inline_keyboard: init.keyboard.reply_markup.inline_keyboard
+              }
             });
           }
+        }
 
-          await ctx.reply(response.text);
-          await ctx.reply(messageAndKeyboard.message, messageAndKeyboard.keyboard);
+      } catch (e) {
+        console.log(e)
+        await ctx.reply(`<i>${e.message}</i>`, { parse_mode: 'HTML' });
+      }
+    }
+
+    if (findSessionTelegram.state === ActionState.LOGIN) {
+      try {
+        if (!findSessionTelegram.login.tickEmail) {
+          await this.validatorService.validateTypesString(message);
+          await this.validatorService.validateEmail(message);
+
+          const setEmail = new LoginSession().updateLoginSessionDate({
+            ...findSessionTelegram.login,
+            email: message,
+            tickEmail: true
+          });
+
+          await this.sessionService.updateLogin(id, setEmail);
+          await ctx.reply('Ваш пароль 👇')
+        }
+
+        if (!findSessionTelegram.login.tickPassword && findSessionTelegram.login.tickEmail) {
+          await this.validatorService.validateTypesString(message);
+          const setPassword = new LoginSession().updateLoginSessionDate({
+            ...findSessionTelegram.login,
+            password: message,
+            tickPassword: true,
+            isLogin: true
+          });
+          await this.sessionService.updateLogin(id, setPassword);
+
+          await this.authService.authLogin(id, {
+            email: findSessionTelegram.login.email,
+            password: message
+          })
+
+          await this.sessionService.updateOne(id, {
+            confirmed: true,
+            statusUser: StatusUserBot.REGISTER_BOT_SITE
+          })
+
+          await this.statsService.stats({ authorization: 1 })
+
+          const defaultSession = new LoginSession().createDataSetLogin();
+          await this.sessionService.updateLogin(id, defaultSession);
+
+          const init = await this.initializerService.initStartKeyboard(StatusUserBot.REGISTER_BOT_SITE);
+
+          await ctx.reply(init.caption, init.keyboard)
+        }
+
+      } catch (e) {
+        await ctx.reply(`<i>${e.message}</i>`, { parse_mode: 'HTML' });
+        const findSessionTelegram = await this.sessionService.findOne(id);
+
+        if (findSessionTelegram.login.isLogin) {
+          const defaultSession = new LoginSession().createDataSetLogin();
+          await this.sessionService.updateLogin(id, defaultSession);
+
+          const state = { state: ActionState.DEFAULT }
+          await this.sessionService.updateOne(id, state)
         }
       }
-
     }
+
+    if (findSessionTelegram.state === ActionState.AI_COPYWRITER) {
+      try {
+        await this.validatorService.validateTypesString(message);
+
+        const defaultSession = new CopywritingService().createCopywritingSession();
+        await this.sessionService.updateCopywriterData(id, defaultSession);
+
+
+        if (!findSessionTelegram.copywriting_data.tickName) {
+          const dataSetCopywriting = new CopywritingService().setCopywritingSession({
+            ...findSessionTelegram.copywriting_data,
+            name: message,
+            tickName: true
+          })
+
+          await this.sessionService.updateOne(id, {
+            copywriting_data: dataSetCopywriting
+
+          })
+
+          if (findSessionTelegram.stats.start_generation_button === 0) {
+            const updateStats = new SessionStats().getNewStatsSession({
+              ...findSessionTelegram.stats,
+              start_generation_button: 1
+            })
+
+            await this.sessionService.updateStats(id, updateStats);
+
+            await this.statsService.stats({ start_generation_button: 1 })
+          } else {
+            await this.statsService.updateStats({ regenerate_button: 1 })
+          }
+
+
+          await ctx.reply('<b>Введите описание товара</b>\n\n <i>например "\для детей и взрослых, демисезонная, черная\"</i>', {
+            parse_mode: 'HTML',
+          })
+
+        }
+
+        if (!findSessionTelegram.copywriting_data.tickDescription && findSessionTelegram.copywriting_data.tickName) {
+          const dataSetCopywriting = new CopywritingService().setCopywritingSession({
+            ...findSessionTelegram.copywriting_data,
+            description: message,
+            tickDescription: true,
+          })
+
+          await this.sessionService.updateOne(id, {
+            copywriting_data: dataSetCopywriting
+          })
+
+          await ctx.reply('<b>Введите ключевые слова</b>\n\n<i>цвет - желтый, размер - s, m, l, xl, застежка - молния, стильная и яркая</i>', {
+            parse_mode: 'HTML',
+          })
+
+        }
+
+        if (
+          findSessionTelegram.copywriting_data.tickDescription &&
+          findSessionTelegram.copywriting_data.tickName &&
+          !findSessionTelegram.copywriting_data.tickKeywords
+        ) {
+          const dataSetCopywriting = new CopywritingService().setCopywritingSession({
+            ...findSessionTelegram.copywriting_data,
+            keywords: message,
+            tickKeywords: true,
+          })
+
+          await this.sessionService.updateOne(id, {
+            copywriting_data: dataSetCopywriting
+          })
+
+          await ctx.reply('Генерация может занять некоторе время... 🤞🏽')
+          const response = await this.initializerService.getAiDataBot(findSessionTelegram.copywriting_data, id);
+
+          if (response) {
+            await ctx.reply(response)
+
+            const init = await this.initializerService.initKeyboard(findSessionTelegram.state)
+            await ctx.reply(init.message, init.keyboard);
+          }
+
+        }
+      } catch (e) {
+
+      }
+    }
+
   }
 
-  // @Cron('* * * * *')
-  // async messageRegister(@Ctx() ctx: TelegrafContext) {
-  //     await this.cronTasks.find((task) => task.messageEmailRegister())
-  // }
+  @Cron(CronExpression.EVERY_12_HOURS, { timeZone: 'Europe/Moscow' })
+    async event() {
+        const users = await this.userService.findAll();
+
+        const link = path.join(__dirname, '../public/photo_2023-03-22_17-18-36.jpg')
+        const sourceImg = fs.createReadStream(link)
+        console.log(link)
+        users.map(async (user) => {
+           await this.bot.sendPhoto(user.telegramUserId, {source: sourceImg},{
+            caption: `<b>🔥Эксклюзивное предложение для наших пользователей🔥</b>\n\nВы успели оценить нашего ИИ-бота, обученного на основе 30 000 описаний товаров ВБ. И точно знаете, насколько он облегчает работу. У нас для вас особое предложение🤫\n\n🎁 Получите ПОЛНЫЙ доступ к генерации 5000 описаний на Вайлдберриз всего за 1000 RUB на 3 месяца! 🎁\n\n⏳ Акционное предложение действует до 27 марта!`,
+            parse_mode: 'HTML'
+        });
+           await this.bot.sendMessage(user.telegramUserId, `С полным доступом Вы сможете:\n\n✅ Сэкономить время на создание качественных описаний, благодаря обученному боту.\n✅ Увеличить конверсию и продажи с помощью SEO-текстов. ИИ-бот вставляет ключевые слова для лучшей индексации товара на Вайлдберриз.\n✅ Сосредоточиться на важных аспектах бизнеса, пока бот пишет тексты.\n\nДля активации акции и оплаты напишите @JayPr0  пометкой ЛОЯЛЬНЫЙ2023`)
+           await this.bot.sendMessage(user.telegramUserId, `🎉А ещё у нас есть бонус🎉\n\nХотите получить пополнение на 50 000 символов? Напишите @JayPr0, уделите 10-15 минут на небольшой опрос и мы пополним Ваш баланс!\n\nНе упустите выгодную возможность раскрыть ИИ-бот на полную катушку! 🚀\n\nС уважением,\nкоманда ИИ-бота`)
+        })
+    }
+
+  
 
 }

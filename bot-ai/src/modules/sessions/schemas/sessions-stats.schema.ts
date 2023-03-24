@@ -9,7 +9,7 @@ export class SessionStats {
     start_generation_button: number;
     regenerate_button: number;
     track_position_button: number;
-    reviews_or_copyright: [];
+    reviews_or_copyright: number[];
 
     createStatsSession() {
         return {
@@ -23,6 +23,21 @@ export class SessionStats {
             reviews_or_copyright: []
         }
     }
+
+    getNewStatsSession(stats: Partial<Stats>) {
+        return {
+            start_bot: stats.start_bot,
+            channels_button: stats.channels_button,
+            success_registration: stats.success_registration,
+            support_button: stats.support_button,
+            start_generation_button: stats.start_generation_button,
+            regenerate_button: stats.regenerate_button,
+            track_position_button: stats.track_position_button,
+            reviews_or_copyright: stats.reviews_or_copyright
+        }
+    }
+
+    
 
 
 }

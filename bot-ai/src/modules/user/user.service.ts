@@ -17,12 +17,41 @@ export class UserService {
         return await this._userRepository.findOne({ telegramUser })
     }
 
-    async updateUser(data) {
-        return await this._userRepository.findOneAndUpdate({ telegramUser: data.telegramUser }, {confirmed: data.confirmed})
+    async updateUser(id, data) {
+        return await this._userRepository.findOneAndUpdate({
+            where: {
+                userId: id
+            },
+            $set:data,
+        })
+    }
+
+    async findByTelegramUserUpdateTelegramId(telegramUser: string, data: Partial<User>) {
+        return await this._userRepository.findOneAndUpdate({
+            where: {
+                telegramUser: telegramUser
+            },
+            $set:data,
+        })
+    }
+
+    async updateGenerateSymbols(id, number) {
+        return await this._userRepository.findOneAndUpdate({
+            where: {
+                userId: id
+            },
+            $inc: {
+                generateSymbol: -number
+            }
+        })
     }
 
     async findByTelegramId (telegramId: User['telegramUserId']) {
         return await this._userRepository.findOne({ telegramId })
+    }
+
+    async findAll(){
+        return await this._userRepository.find()
     }
 
 }

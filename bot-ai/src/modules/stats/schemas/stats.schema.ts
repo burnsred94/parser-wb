@@ -17,6 +17,9 @@ export class Stats {
 
     @Prop({required: true, type: 'Number', default: 0})
     success_registration: number;
+    
+    @Prop({required: true, type: 'Number', default: 0})
+    authorization: number;
 
     @Prop({required: true, type: 'Number', default: 0})
     support_button: number;

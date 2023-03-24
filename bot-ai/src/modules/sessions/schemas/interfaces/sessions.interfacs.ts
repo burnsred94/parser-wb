@@ -1,7 +1,6 @@
 import { Types } from "mongoose";
 
 export interface CopywritingData {
-    _id: Types.ObjectId;
     description: string,
     keywords: string,
     name: string,
@@ -19,4 +18,12 @@ export interface Stats {
     regenerate_button: number,
     track_position_button: number,
     reviews_or_copyright: number[]
+}
+
+export interface Login {
+    email: string;
+    password: string;
+    tickEmail: boolean;
+    tickPassword: boolean;
+    isLogin: boolean;    
 }

@@ -12,7 +12,6 @@ import { UpdateRegister } from './actions/action-register';
 import { InitializerService } from './modules/initializer/initializer.service';
 import * as LocalSession from 'telegraf-session-local';
 import { UpdateAiCopyWrite } from './actions/action-soft';
-import { UpdateMenuCopyWrite } from './actions/aciton-menu';
 import { UpdateActionSupport } from './actions/action-support';
 import { UpdateChats } from './actions/action-chats-and-chanels';
 import { UpdateReview } from './actions/action-review';
@@ -23,6 +22,9 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { TaskManagerService } from './modules/task-manager/task-manager.service';
 import { StatsModule } from './modules/stats/stats.module';
 import { SessionsModule } from './modules/sessions/sessions.module';
+import { ValidatorService } from './modules/validator/validator.service';
+import { UpdateLogin } from './actions/action.login';
+import { UpdateLogout } from './actions/logout';
 
 const sessions = new LocalSession({
   database: './sessions.json'
@@ -32,7 +34,7 @@ const sessions = new LocalSession({
   imports: [
     ScheduleModule.forRoot(),
     TelegrafModule.forRoot({
-      token: '6230430443:AAGoS3eiv1PEIpoJBHZskL6A5y0ZU375Abs',
+      token: '6054044696:AAFGvQUnf1ka-lSDRiM1CY0Y_Cy6VymwBA0',
       middlewares: [sessions]
     }),
     ConfigModule.forRoot({
@@ -54,13 +56,15 @@ const sessions = new LocalSession({
     UpdateRegister,
     InitializerService,
     UpdateAiCopyWrite,
-    UpdateMenuCopyWrite,
     UpdateActionSupport,
     UpdateChats,
     UpdateReview,
     UpdateTrackerPosition,
     UpdateServices,
     TaskManagerService,
+    ValidatorService,
+    UpdateLogin,
+    UpdateLogout
   ],
 })
 export class AppModule { }

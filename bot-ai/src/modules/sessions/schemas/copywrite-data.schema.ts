@@ -1,5 +1,6 @@
+import { CopywritingData } from "./interfaces/sessions.interfacs";
 
-export class Copywriting {
+export class CopywritingService {
     description: string;
     keywords: string;
     name: string;
@@ -15,6 +16,17 @@ export class Copywriting {
             tickDescription: false,
             tickKeywords: false,
             tickName: false
+        }
+    }
+
+    setCopywritingSession(copywritingSession: Partial<CopywritingData>) {
+        return {
+            description: copywritingSession.description,
+            keywords: copywritingSession.keywords,
+            name: copywritingSession.name,
+            tickDescription: copywritingSession.tickDescription,
+            tickKeywords: copywritingSession.tickKeywords,
+            tickName: copywritingSession.tickName
         }
     }
 }
