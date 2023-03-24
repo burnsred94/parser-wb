@@ -19,6 +19,12 @@ export class UpdateLogout {
     const statusUser = { statusUser: StatusUserBot.NOT_REGISTERED }
     await this.sessionService.updateOne(id, statusUser)
     
-    await ctx.reply("Вы вышли из своего аккаунта\nПерезапустите бота для дальнейших действий")
+    await ctx.reply("Вы вышли из своего аккаунта\nПерезапустите бота для дальнейших действий", {
+      reply_markup: {
+        inline_keyboard: [
+          [{ text: "📋 Вернутся в меню", callback_data: "start" }]
+        ]
+      }
+    })
   }
 }

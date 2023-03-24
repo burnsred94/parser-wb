@@ -185,7 +185,11 @@ export class AppService {
 
       } catch (e) {
         console.log(e)
-        await ctx.reply(`<i>${e.message}</i>`, { parse_mode: 'HTML' });
+        await ctx.reply(`<i>${e.message}</i>`, { parse_mode: 'HTML', reply_markup: {
+          inline_keyboard: [
+            [{ text: "📋 Вернутся в меню", callback_data: "start" }]
+          ]
+        } });
       }
     }
 
@@ -236,7 +240,11 @@ export class AppService {
         }
 
       } catch (e) {
-        await ctx.reply(`<i>${e.message}</i>`, { parse_mode: 'HTML' });
+        await ctx.reply(`<i>${e.message}</i>`, { parse_mode: 'HTML', reply_markup: {
+          inline_keyboard: [
+            [{ text: "📋 Вернутся в меню", callback_data: "start" }]
+          ]
+        } });
         const findSessionTelegram = await this.sessionService.findOne(id);
 
         if (findSessionTelegram.login.isLogin) {
