@@ -119,7 +119,8 @@ export class InitializerService {
                                 [{ text: "🔐  Другие Сервисы ", callback_data: 'not_access' }],
                                 [{ text: "💬 Наши каналы и чаты", callback_data: 'chats_and_chanels' }],
                                 [{ text: "🤝 Поддержка", callback_data: 'support' }],
-                                [{ text: "🔑 Авторизация", callback_data: 'login' }]
+                                [{ text: "🔑 Авторизация", callback_data: 'login' }],
+                                [{ text: "🚪🚶 Выйти", callback_data: 'logout' }]
                             ]
                         }
                     }
