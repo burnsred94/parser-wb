@@ -20,9 +20,9 @@ export class UserService {
     async updateUser(id, data) {
         return await this._userRepository.findOneAndUpdate({
             where: {
-                userId: id
+            telegramUserId: id
             },
-            $set:data,
+            data,
         })
     }
 
