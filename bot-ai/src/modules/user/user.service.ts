@@ -6,52 +6,78 @@ import { User, UserDocument } from './schemas/user.schema';
 
 @Injectable()
 export class UserService {
-
-    constructor(@InjectModel(User.name) private _userRepository: Model<UserDocument>){}
+    constructor(
+        @InjectModel(User.name) private _userRepository: Model<UserDocument>,
+    ) { }
 
     async create(user: Partial<User>) {
-         return await this._userRepository.create(user)
+        return await this._userRepository.create(user);
     }
 
     async findByTelegram(telegramUser: string) {
-        return await this._userRepository.findOne({ telegramUser })
+        return await this._userRepository.findOne({
+            telegramUser: telegramUser,
+        });
     }
 
     async updateUser(id, data) {
-        return await this._userRepository.findOneAndUpdate({
-            where: {
-            telegramUserId: id
-            },
-            $set:data,
-        })
+        await this._userRepository.findOneAndUpdate({
+            telegramUserId: id,
+
+        });
+
+        console.log;
     }
 
-    async findByTelegramUserUpdateTelegramId(telegramUser: string, data: Partial<User>) {
-        return await this._userRepository.findOneAndUpdate({
-            where: {
-                telegramUser: telegramUser
-            },
-            $set:data,
-        })
+    async findByTelegramUserUpdateTelegramId(
+        telegramUser: string,
+        data: Partial<User>,
+    ) {
+        const user = await this._userRepository.findOne({ telegramUser: telegramUser });
+
+        console.log(user);
+
+        if (user) {
+            const updateUser = await this._userRepository.findOneAndUpdate(
+                {
+                    telegramUser: telegramUser
+                },
+                {
+                    $set: {
+                        ...data,
+                    },
+                }
+            );
+
+            updateUser.save();
+        } else {
+            const newData = {
+                telegramUser: telegramUser,
+                telegramUserId: data.telegramUserId,
+                ...data,
+            };
+            const newUser = await this._userRepository.create(newData);
+            newUser.save();
+        }
     }
 
     async updateGenerateSymbols(id, number) {
         return await this._userRepository.findOneAndUpdate({
-            where: {
-                telegramUserId: id
-            },
+            telegramUserId: id,
             $inc: {
-                generateSymbol: -number
-            }
-        })
+                generateSymbol: -number,
+            },
+        });
     }
 
-    async findByTelegramId (telegramId: User['telegramUserId']) {
-        return await this._userRepository.findOne({ telegramId })
+    async findByTelegramId(telegramId: User['telegramUserId']) {
+        console.log(telegramId);
+        return await this._userRepository.findOne({
+            telegramUserId: telegramId,
+        });
     }
 
-    async findAll(){
-        return await this._userRepository.find()
+    async findAll() {
+        return await this._userRepository.find();
     }
-
 }

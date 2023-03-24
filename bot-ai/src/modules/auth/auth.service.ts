@@ -47,7 +47,7 @@ export class AuthService {
         }
     }
 
-    async authLogin(id: number,data: Partial<Login>) {
+    async authLogin(username: string,data: Partial<Login>) {
 
         const api_url = await this.configService.get('API_URL');
 
@@ -59,11 +59,7 @@ export class AuthService {
                 throw new BadRequestException("При авторизации <b>SellersHub</b> произошла ошибка.\nОбратитесь в поддержку 🤝\n\nВозможные причины ошибки:\n⛔Вы указали неправильные данные для входа\n⛔Вы у нас не зарегистрированы\n⛔Ваша почта не подтверждена")
             }
         }).then(async (res) => {
-            console.log(res)
-            await this.userService.updateUser(id,{
-                email: data.email,
-                confirmed: true,
-            })
+            await this.userService.findByTelegramUserUpdateTelegramId(username,data)
         })
 
     }

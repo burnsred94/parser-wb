@@ -1,4 +1,5 @@
 import { Types } from "mongoose";
+import { User } from "src/modules/user/schemas/user.schema";
 
 export interface CopywritingData {
     description: string,
@@ -20,7 +21,7 @@ export interface Stats {
     reviews_or_copyright: number[]
 }
 
-export interface Login {
+export interface Login extends User {
     email: string;
     password: string;
     tickEmail: boolean;

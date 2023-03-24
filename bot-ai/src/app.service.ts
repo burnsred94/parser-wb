@@ -43,9 +43,6 @@ export class AppService {
 
   @Use()
   async middleware(ctx: TelegrafContext, next: () => Promise<void>) {
-    const { id, username } = ctx.message ? ctx.message.from : ctx.callbackQuery.from
-    await this.userService.findByTelegramUserUpdateTelegramId(username, { telegramUserId: id})
-    
     await next();
   }
 
@@ -54,31 +51,31 @@ export class AppService {
   async start(@Ctx() ctx: TelegrafContext) {
     const { id, username } = ctx.message ? ctx.message.from : ctx.callbackQuery.from
 
-    
+
     const findUserTelegram = await this.userService.findByTelegramId(id);
-    
+
     await this.statsService.stats({ start_bot: 1 })
-    
+    console.log(findUserTelegram)
     if (findUserTelegram) {
       const findSessionTelegram = await this.sessionService.findOne(id);
-      
+
       if (findSessionTelegram?.date === this.date && findSessionTelegram !== null) {
         await this.sessionService.findOneAndUpdate(id, {
           copywriting_data: this.copywriting,
         })
-        
+
         const init = await this.initializerService.initStartKeyboard(findSessionTelegram.statusUser)
-        
+
         if (init) {
           await ctx.reply(init.caption, {
             parse_mode: 'HTML',
             reply_markup: {
               inline_keyboard: init.keyboard.reply_markup.inline_keyboard,
             },
-            
+
           })
         }
-        
+
       } else if (findSessionTelegram?.date !== this.date && findSessionTelegram !== null) {
         const session = new Session(id, findUserTelegram);
 
@@ -103,7 +100,7 @@ export class AppService {
         await this.sessionService.createSession(session);
 
         const init = await this.initializerService.initStartKeyboard(session.statusUser)
-
+        console.log('not user')
         await this.userService.findByTelegramUserUpdateTelegramId(username, { telegramUserId: id, generateSymbol: 1500 })
 
         if (init) {
@@ -119,9 +116,9 @@ export class AppService {
 
 
     } else {
-      const user = await this.userService.create({ telegramUserId: id, username: username });
+      const user = await this.userService.create({ telegramUserId: id, telegramUser: username });
 
-      const session = new Session(ctx.message.from.id, user)
+      const session = new Session(id, user)
       const sessionInDb = await this.sessionService.createSession(session);
 
       const init = await this.initializerService.initStartKeyboard(sessionInDb.statusUser);
@@ -144,7 +141,7 @@ export class AppService {
 
   @On('message')
   async getMessage(@Message('text') message: string, @Ctx() ctx: TelegrafContext) {
-    const { id } = ctx.message.from
+    const { id, username } = ctx.message.from
 
     const findSessionTelegram = await this.sessionService.findOne(id);
 
@@ -185,11 +182,13 @@ export class AppService {
 
       } catch (e) {
         console.log(e)
-        await ctx.reply(`<i>${e.message}</i>`, { parse_mode: 'HTML', reply_markup: {
-          inline_keyboard: [
-            [{ text: "📋 Вернутся в меню", callback_data: "start" }]
-          ]
-        } });
+        await ctx.reply(`<i>${e.message}</i>`, {
+          parse_mode: 'HTML', reply_markup: {
+            inline_keyboard: [
+              [{ text: "📋 Вернутся в меню", callback_data: "start" }]
+            ]
+          }
+        });
       }
     }
 
@@ -219,9 +218,10 @@ export class AppService {
           });
           await this.sessionService.updateLogin(id, setPassword);
 
-          await this.authService.authLogin(id, {
+          await this.authService.authLogin(username, {
             email: findSessionTelegram.login.email,
-            password: message
+            password: message,
+            telegramUserId: id
           })
 
           await this.sessionService.updateOne(id, {
@@ -240,11 +240,13 @@ export class AppService {
         }
 
       } catch (e) {
-        await ctx.reply(`<i>${e.message}</i>`, { parse_mode: 'HTML', reply_markup: {
-          inline_keyboard: [
-            [{ text: "📋 Вернутся в меню", callback_data: "start" }]
-          ]
-        } });
+        await ctx.reply(`<i>${e.message}</i>`, {
+          parse_mode: 'HTML', reply_markup: {
+            inline_keyboard: [
+              [{ text: "📋 Вернутся в меню", callback_data: "start" }]
+            ]
+          }
+        });
         const findSessionTelegram = await this.sessionService.findOne(id);
 
         if (findSessionTelegram.login.isLogin) {
@@ -348,22 +350,22 @@ export class AppService {
   }
 
   @Cron(CronExpression.EVERY_12_HOURS, { timeZone: 'Europe/Moscow' })
-    async event() {
-        const users = await this.userService.findAll();
+  async event() {
+    const users = await this.userService.findAll();
 
-        const link = path.join(__dirname, '../public/photo_2023-03-22_17-18-36.jpg')
-        const sourceImg = fs.createReadStream(link)
-        console.log(link)
-        users.map(async (user) => {
-           await this.bot.sendPhoto(user.telegramUserId, {source: sourceImg},{
-            caption: `<b>🔥Эксклюзивное предложение для наших пользователей🔥</b>\n\nВы успели оценить нашего ИИ-бота, обученного на основе 30 000 описаний товаров ВБ. И точно знаете, насколько он облегчает работу. У нас для вас особое предложение🤫\n\n🎁 Получите ПОЛНЫЙ доступ к генерации 5000 описаний на Вайлдберриз всего за 1000 RUB на 3 месяца! 🎁\n\n⏳ Акционное предложение действует до 27 марта!`,
-            parse_mode: 'HTML'
-        });
-           await this.bot.sendMessage(user.telegramUserId, `С полным доступом Вы сможете:\n\n✅ Сэкономить время на создание качественных описаний, благодаря обученному боту.\n✅ Увеличить конверсию и продажи с помощью SEO-текстов. ИИ-бот вставляет ключевые слова для лучшей индексации товара на Вайлдберриз.\n✅ Сосредоточиться на важных аспектах бизнеса, пока бот пишет тексты.\n\nДля активации акции и оплаты напишите @JayPr0  пометкой ЛОЯЛЬНЫЙ2023`)
-           await this.bot.sendMessage(user.telegramUserId, `🎉А ещё у нас есть бонус🎉\n\nХотите получить пополнение на 50 000 символов? Напишите @JayPr0, уделите 10-15 минут на небольшой опрос и мы пополним Ваш баланс!\n\nНе упустите выгодную возможность раскрыть ИИ-бот на полную катушку! 🚀\n\nС уважением,\nкоманда ИИ-бота`)
-        })
-    }
+    const link = path.join(__dirname, '../public/photo_2023-03-22_17-18-36.jpg')
+    const sourceImg = fs.createReadStream(link)
+    console.log(link)
+    users.map(async (user) => {
+      await this.bot.sendPhoto(user.telegramUserId, { source: sourceImg }, {
+        caption: `<b>🔥Эксклюзивное предложение для наших пользователей🔥</b>\n\nВы успели оценить нашего ИИ-бота, обученного на основе 30 000 описаний товаров ВБ. И точно знаете, насколько он облегчает работу. У нас для вас особое предложение🤫\n\n🎁 Получите ПОЛНЫЙ доступ к генерации 5000 описаний на Вайлдберриз всего за 1000 RUB на 3 месяца! 🎁\n\n⏳ Акционное предложение действует до 27 марта!`,
+        parse_mode: 'HTML'
+      });
+      await this.bot.sendMessage(user.telegramUserId, `С полным доступом Вы сможете:\n\n✅ Сэкономить время на создание качественных описаний, благодаря обученному боту.\n✅ Увеличить конверсию и продажи с помощью SEO-текстов. ИИ-бот вставляет ключевые слова для лучшей индексации товара на Вайлдберриз.\n✅ Сосредоточиться на важных аспектах бизнеса, пока бот пишет тексты.\n\nДля активации акции и оплаты напишите @JayPr0  пометкой ЛОЯЛЬНЫЙ2023`)
+      await this.bot.sendMessage(user.telegramUserId, `🎉А ещё у нас есть бонус🎉\n\nХотите получить пополнение на 50 000 символов? Напишите @JayPr0, уделите 10-15 минут на небольшой опрос и мы пополним Ваш баланс!\n\nНе упустите выгодную возможность раскрыть ИИ-бот на полную катушку! 🚀\n\nС уважением,\nкоманда ИИ-бота`)
+    })
+  }
 
-  
+
 
 }
