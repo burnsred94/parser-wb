@@ -11,18 +11,18 @@ export class UpdateReview {
     constructor(
         private readonly statsService: StatsService,
         private readonly sessionService: SessionsService,
-        ) { }
+    ) { }
 
 
     @Action('review')
     async menu(ctx: TelegrafContext) {
 
-        const {id} = ctx.from
+        const { id } = ctx.from
 
-        const state = {state: ActionState.REVIEW}
+        const state = { state: ActionState.REVIEW }
         await this.sessionService.updateOne(id, state)
 
-        
+
         await ctx.reply('<b>Оставте отзыв о работе нашего АI</b>\n\n <i>Он будет рад 🎊</i>',
             {
                 parse_mode: 'HTML',
@@ -55,7 +55,8 @@ export class UpdateReview {
                             [{ text: "🤖 AI - Копирайтер", callback_data: 'copywriter' }],
                             [{ text: "📟  Другие Сервисы", callback_data: 'services' }],
                             [{ text: "💬 Наши каналы и чаты", callback_data: 'chats_and_chanels' }],
-                            [{ text: "🤝 Поддержка", callback_data: 'support' }]
+                            [{ text: "🤝 Поддержка", callback_data: 'support' }],
+                            [{ text: "🚪🚶 Выйти", callback_data: 'logout' }]
                         ]
                     }
                 })

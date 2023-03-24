@@ -40,8 +40,8 @@ export const keyboardsAction = async (action: Action) => {
                 keyboard: {
                     reply_markup: {
                         inline_keyboard: [
-                            [{ text: "Генерировать еще 🤖", callback_data:'copywriter' }, { text: "Оцените работу AI ⭐", callback_data:'review' }],
-                            [{ text: "🔙 Вернутся в меню", callback_data: 'menu' }]
+                            [{ text: "Генерировать еще 🤖", callback_data: 'copywriter' }, { text: "Оцените работу AI ⭐", callback_data: 'review' }],
+                            [{ text: "🔙 Вернуться в меню", callback_data: 'menu' }]
                         ]
                     }
                 }

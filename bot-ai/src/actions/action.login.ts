@@ -22,6 +22,6 @@ export class UpdateLogin {
     );
     setTimeout(async () => {
       await ctx.sendMessage('Введите ваш имейл ниже 👇')
-    }, 2000)
+    }, 1500)
   }
 }

@@ -158,7 +158,7 @@ export class InitializerService {
                         reply_markup: {
                             inline_keyboard: [
                                 [symbols.generateSymbol > 0 ? { text: "Генерировать еще 🤖", callback_data: 'copywriter' } : { text: 'Пополнить 💊', url: 'https://t.me/evgeniy_sellershub_ru' }, { text: "Оцените работу AI ⭐", callback_data: 'review' }],
-                                [{ text: "🔙 Вернутся в меню", callback_data: 'start' }]
+                                [{ text: "🔙 Вернуться в меню", callback_data: 'start' }]
                             ]
                         }
                     }

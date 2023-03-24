@@ -39,7 +39,7 @@ export class UpdateActionSupport {
                         [{ text: "💬 Консультация по сотрудничеству и партнерским программам", url: "https://t.me/jlmr11" }],
                         [{ text: "💬 Вопросы, касаемые онлайн-каталога", url: "https://t.me/sellershub_m" }],
                         [{ text: "💬 Технические проблемы и неполадки", url: "https://t.me/Sellershub_support" }],
-                        [{ text: "📋 Вернутся в меню", callback_data: "start" }, { text: "💬 Наши каналы и чаты", callback_data: "chats_and_chanels" }]
+                        [{ text: "📋 Вернуться в меню", callback_data: "start" }, { text: "💬 Наши каналы и чаты", callback_data: "chats_and_chanels" }]
                     ]
                 }
             })
