@@ -5,7 +5,7 @@ import { SessionsService } from "src/modules/sessions/sessions.service";
 
 
 @Update()
-export class UpdateLogin {
+export class NotAccess {
 
 
   @Action("not_access")
@@ -14,5 +14,5 @@ export class UpdateLogin {
     await ctx.sendMessage('Вы еще не подтвердили свои данные\n\nАвторизуйтесь в системе')
 
   }
-      
+
 }

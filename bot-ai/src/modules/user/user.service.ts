@@ -23,10 +23,8 @@ export class UserService {
     async updateUser(id, data) {
         await this._userRepository.findOneAndUpdate({
             telegramUserId: id,
-
         });
 
-        console.log;
     }
 
     async findByTelegramUserUpdateTelegramId(
@@ -35,17 +33,13 @@ export class UserService {
     ) {
         const user = await this._userRepository.findOne({ telegramUser: telegramUser });
 
-        console.log(user);
-
         if (user) {
             const updateUser = await this._userRepository.findOneAndUpdate(
                 {
                     telegramUser: telegramUser
                 },
                 {
-                    $set: {
-                        ...data,
-                    },
+                    $set: data
                 }
             );
 
@@ -62,16 +56,12 @@ export class UserService {
     }
 
     async updateGenerateSymbols(id, number) {
-        return await this._userRepository.findOneAndUpdate({
-            telegramUserId: id,
-            $inc: {
-                generateSymbol: -number,
-            },
+        return await this._userRepository.findOneAndUpdate({ telegramUserId: id }, {
+            $inc: { generateSymbol: -number }
         });
     }
 
     async findByTelegramId(telegramId: User['telegramUserId']) {
-        console.log(telegramId);
         return await this._userRepository.findOne({
             telegramUserId: telegramId,
         });

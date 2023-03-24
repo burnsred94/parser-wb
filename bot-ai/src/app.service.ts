@@ -332,12 +332,12 @@ export class AppService {
           })
 
           await ctx.reply('Генерация может занять некоторе время... 🤞🏽')
-          const response = await this.initializerService.getAiDataBot(findSessionTelegram.copywriting_data, id);
+          const response = await this.initializerService.getAiDataBot(findSessionTelegram.copywriting_data, findSessionTelegram.userId);
 
           if (response) {
             await ctx.reply(response)
 
-            const init = await this.initializerService.initKeyboard(findSessionTelegram.state)
+            const init = await this.initializerService.initKeyboard(ActionState.AI_COPYWRITER, id)
             await ctx.reply(init.message, init.keyboard);
           }
 

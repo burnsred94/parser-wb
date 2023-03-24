@@ -25,6 +25,7 @@ import { SessionsModule } from './modules/sessions/sessions.module';
 import { ValidatorService } from './modules/validator/validator.service';
 import { UpdateLogin } from './actions/action.login';
 import { UpdateLogout } from './actions/logout';
+import { NotAccess } from './actions/action-not-access';
 
 const sessions = new LocalSession({
   database: './sessions.json'
@@ -64,7 +65,8 @@ const sessions = new LocalSession({
     TaskManagerService,
     ValidatorService,
     UpdateLogin,
-    UpdateLogout
+    UpdateLogout,
+    NotAccess
   ],
 })
 export class AppModule { }

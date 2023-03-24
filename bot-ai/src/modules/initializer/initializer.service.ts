@@ -76,7 +76,6 @@ export class InitializerService {
         }).catch((err: AxiosError) => {
             throw new BadRequestException('К сожалению мы не смогли сгенирировать текст\n\nПопробуйте позже')
         }).then((res: AxiosResponse) => {
-            console.log(res.data.text.length)
             this.userService.updateGenerateSymbols(id, res.data.text.length)
             return res.data.text
         })
@@ -154,11 +153,11 @@ export class InitializerService {
         switch (action) {
             case Action.AI_COPYWRITER: {
                 return {
-                    message: `Хотите другое описание?\n\nУ вас осталось символов для генирации ${symbols.generateSymbol}`,
+                    message: `Хотите другое описание?\n\nУ вас осталось символов для генирации ${symbols.generateSymbol < 0 ? 0 : symbols.generateSymbol}`,
                     keyboard: {
                         reply_markup: {
                             inline_keyboard: [
-                                [symbols.generateSymbol > 0 ? { text: "Генерировать еще 🤖",  callback_data: 'copywriter' } : { text: 'Пополнить 💊',  url: 'https://t.me/evgeniy_sellershub_ru' }, { text: "Оцените работу AI ⭐", callback_data: 'review' }],
+                                [symbols.generateSymbol > 0 ? { text: "Генерировать еще 🤖", callback_data: 'copywriter' } : { text: 'Пополнить 💊', url: 'https://t.me/evgeniy_sellershub_ru' }, { text: "Оцените работу AI ⭐", callback_data: 'review' }],
                                 [{ text: "🔙 Вернутся в меню", callback_data: 'start' }]
                             ]
                         }
