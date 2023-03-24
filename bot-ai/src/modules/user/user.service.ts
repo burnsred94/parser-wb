@@ -22,7 +22,7 @@ export class UserService {
             where: {
             telegramUserId: id
             },
-            data,
+            $set:data,
         })
     }
 
@@ -38,7 +38,7 @@ export class UserService {
     async updateGenerateSymbols(id, number) {
         return await this._userRepository.findOneAndUpdate({
             where: {
-                userId: id
+                telegramUserId: id
             },
             $inc: {
                 generateSymbol: -number
