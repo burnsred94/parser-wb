@@ -30,7 +30,7 @@ export class UpdateAiCopyWrite {
                 await ctx.reply('К сожалению у вас закончились символы\n\nВы можете пополнить их нажав на кнопку ниже', {
                         reply_markup: {
                             inline_keyboard: [
-                                [{text: 'Пополнить 💊 ', url: 'https://t.me/https://t.me/evgeniy_sellershub_ru' }],
+                                [{text: 'Пополнить 💊 ', url: 'https://t.me/evgeniy_sellershub_ru' }],
                                 [{ text: "🔙 Вернутся в меню", callback_data: 'start' }]
                             ]
                         }
