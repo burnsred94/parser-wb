@@ -43,6 +43,9 @@ export class AppService {
 
   @Use()
   async middleware(ctx: TelegrafContext, next: () => Promise<void>) {
+    const { id, username } = ctx.message ? ctx.message.from : ctx.callbackQuery.from
+    await this.userService.findByTelegramUserUpdateTelegramId(username, { telegramUserId: id})
+    
     await next();
   }
 
