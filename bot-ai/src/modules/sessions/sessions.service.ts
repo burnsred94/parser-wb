@@ -13,70 +13,34 @@ export class SessionsService {
 
 
     async createSession(session: Session) {
-        console.log(session)
         return await this._sessionRepository.create(session);
     }
 
     async findOneAndUpdate(userId: Session['userId'], data: Partial<Session>) {
-        return await this._sessionRepository.findOneAndUpdate({
-            where: {
-                userId: userId
-            },
-            data,
-        });
+        return await this._sessionRepository.findOneAndUpdate({ userId: userId }, { ...data });
     }
 
     async updateOne(userId: Session['userId'], data: Partial<Session>) {
-        const dataUpdated = await this._sessionRepository.updateOne({
-            where: {
-                userId: userId
-            },
-            $set: data
-
-        })
-        return dataUpdated;
+        return await this._sessionRepository.updateOne({ userId: userId }, { ...data })
     }
 
     async updateStats(userId: Session['userId'], data: Partial<Stats>) {
-        return await this._sessionRepository.updateOne({
-            where: {
-                userId: userId
-            },
-            stats: data
-        })
+        return await this._sessionRepository.updateOne({ userId: userId }, { stats: data })
     }
 
     async updateLogin(userId: Session['userId'], data: Partial<LoginSession>) {
-        return await this._sessionRepository.updateOne({
-            where: {
-                userId: userId
-            },
-            login: data
-        })
+        return await this._sessionRepository.updateOne({ userId: userId }, { login: data })
     }
 
     async updateCopywriterData(userId: Session['userId'], data: Partial<CopywritingService>) {
-        return await this._sessionRepository.updateOne({
-            where: {
-                userId: userId
-            },
-            copywriting_data: data
-        })
+        return await this._sessionRepository.updateOne({ userId: userId }, { copywriting_data: data })
     }
 
     async findOne(userId: Session['userId']) {
-        return await this._sessionRepository.findOne({
-            where: {
-                userId: userId
-            }
-        });
+        return await this._sessionRepository.findOne({ userId: userId });
     }
 
     async delete(userId: Session['userId']) {
-        return await this._sessionRepository.deleteOne({
-            where: {
-                userId: userId
-            }
-        });
+        return await this._sessionRepository.deleteOne({ userId: userId });
     }
 }

@@ -1,4 +1,4 @@
-import { Action, Command, Ctx, Message, On, Start, Update, Use } from 'nestjs-telegraf';
+import { Action, Ctx, Message, On, Start, Update, Use } from 'nestjs-telegraf';
 
 import { Action as ActionState, StatusUserBot, TelegrafContext } from './interfaces/telegraf-context.interfaces';
 import { InitializerService } from './modules/initializer/initializer.service';
@@ -32,7 +32,6 @@ export class AppService {
     private readonly initializerService: InitializerService,
     private readonly userService: UserService,
     private readonly authService: AuthService,
-    // private readonly taskService: TaskManagerService,
     private readonly statsService: StatsService,
     private readonly sessionService: SessionsService,
     private readonly validatorService: ValidatorService,
@@ -51,11 +50,13 @@ export class AppService {
   async start(@Ctx() ctx: TelegrafContext) {
     const { id, username } = ctx.message ? ctx.message.from : ctx.callbackQuery.from
 
+    const users = await this.userService.findAll()
+    console.log(users)
 
     const findUserTelegram = await this.userService.findByTelegramId(id);
 
     await this.statsService.stats({ start_bot: 1 })
-    console.log(findUserTelegram)
+
     if (findUserTelegram) {
       const findSessionTelegram = await this.sessionService.findOne(id);
 
@@ -97,10 +98,10 @@ export class AppService {
 
       } else {
         const session = new Session(id, findUserTelegram);
-        await this.sessionService.createSession(session);
 
-        const init = await this.initializerService.initStartKeyboard(session.statusUser)
-        console.log('not user')
+        const newSession = await this.sessionService.createSession(session);
+
+        const init = await this.initializerService.initStartKeyboard(newSession.statusUser)
         await this.userService.findByTelegramUserUpdateTelegramId(username, { telegramUserId: id, generateSymbol: 1500 })
 
         if (init) {
@@ -154,6 +155,7 @@ export class AppService {
 
         if (newRegister) {
           const state = { statusUser: StatusUserBot.REGISTERED_BOT };
+
           await this.sessionService.updateOne(id, state)
 
 
@@ -355,10 +357,10 @@ export class AppService {
 
     const link = path.join(__dirname, '../public/photo_2023-03-22_17-18-36.jpg')
     const sourceImg = fs.createReadStream(link)
-    console.log(link)
+
     users.map(async (user) => {
       await this.bot.sendPhoto(user.telegramUserId, { source: sourceImg }, {
-        caption: `<b>🔥Эксклюзивное предложение для наших пользователей🔥</b>\n\nВы успели оценить нашего ИИ-бота, обученного на основе 30 000 описаний товаров ВБ. И точно знаете, насколько он облегчает работу. У нас для вас особое предложение🤫\n\n🎁 Получите ПОЛНЫЙ доступ к генерации 5000 описаний на Вайлдберриз всего за 1000 RUB на 3 месяца! 🎁\n\n⏳ Акционное предложение действует до 27 марта!`,
+        caption: `<b>🔥Эксклюзивное предложение для наших пользователей🔥</b>\n\nВы успели оценить нашего ИИ-бота, обученного на основе 30 000 описаний товаров ВБ. И точно знаете, насколько он облегчает работу. У нас для вас особое предложение🤫\n\n🎁 Получите ПОЛНЫЙ доступ к генерации 5000 описаний на Вайлдберриз всего за 1000 RUB на 3 месяца! 🎁\n\n⏳ Акционное предложение действует до 30 марта!`,
         parse_mode: 'HTML'
       });
       await this.bot.sendMessage(user.telegramUserId, `С полным доступом Вы сможете:\n\n✅ Сэкономить время на создание качественных описаний, благодаря обученному боту.\n✅ Увеличить конверсию и продажи с помощью SEO-текстов. ИИ-бот вставляет ключевые слова для лучшей индексации товара на Вайлдберриз.\n✅ Сосредоточиться на важных аспектах бизнеса, пока бот пишет тексты.\n\nДля активации акции и оплаты напишите @JayPr0  пометкой ЛОЯЛЬНЫЙ2023`)

@@ -37,7 +37,7 @@ export class AuthService {
                 throw new BadRequestException("При регистрации <b>SellersHub</b> произошла ошибка.\nОбратитесь в поддержку 🤝\n\nСкорее всего вы уже есть в нашем сервисе\nПопробуйте авторизовться")
             }
         }).then(async () => {
-            await this.userService.updateUser(id, {email: data})
+            await this.userService.updateUser(id, { email: data })
 
         });
 
@@ -47,7 +47,7 @@ export class AuthService {
         }
     }
 
-    async authLogin(username: string,data: Partial<Login>) {
+    async authLogin(username: string, data: Partial<Login>) {
 
         const api_url = await this.configService.get('API_URL');
 
@@ -56,10 +56,12 @@ export class AuthService {
             password: data.password,
         }).catch((error: AxiosError) => {
             if (error.response.status === 500 || error.response.status === 400) {
+                console.log(error)
                 throw new BadRequestException("При авторизации <b>SellersHub</b> произошла ошибка.\nОбратитесь в поддержку 🤝\n\nВозможные причины ошибки:\n⛔Вы указали неправильные данные для входа\n⛔Вы у нас не зарегистрированы\n⛔Ваша почта не подтверждена")
             }
         }).then(async (res) => {
-            await this.userService.findByTelegramUserUpdateTelegramId(username,data)
+
+            await this.userService.findByTelegramUserUpdateTelegramId(username, data)
         })
 
     }

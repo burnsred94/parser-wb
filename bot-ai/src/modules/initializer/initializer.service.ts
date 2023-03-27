@@ -76,6 +76,7 @@ export class InitializerService {
         }).catch((err: AxiosError) => {
             throw new BadRequestException('К сожалению мы не смогли сгенирировать текст\n\nПопробуйте позже')
         }).then((res: AxiosResponse) => {
+            console.log(id)
             this.userService.updateGenerateSymbols(id, res.data.text.length)
             return res.data.text
         })

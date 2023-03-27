@@ -21,9 +21,7 @@ export class UserService {
     }
 
     async updateUser(id, data) {
-        await this._userRepository.findOneAndUpdate({
-            telegramUserId: id,
-        });
+        await this._userRepository.findOneAndUpdate({ telegramUserId: id }, { $set: data });
 
     }
 
@@ -34,16 +32,9 @@ export class UserService {
         const user = await this._userRepository.findOne({ telegramUser: telegramUser });
 
         if (user) {
-            const updateUser = await this._userRepository.findOneAndUpdate(
-                {
-                    telegramUser: telegramUser
-                },
-                {
-                    $set: data
-                }
-            );
-
+            const updateUser = await this._userRepository.findOneAndUpdate({ telegramUser: telegramUser }, { $set: data });
             updateUser.save();
+
         } else {
             const newData = {
                 telegramUser: telegramUser,
@@ -59,15 +50,20 @@ export class UserService {
         return await this._userRepository.findOneAndUpdate({ telegramUserId: id }, {
             $inc: { generateSymbol: -number }
         });
+
     }
 
     async findByTelegramId(telegramId: User['telegramUserId']) {
-        return await this._userRepository.findOne({
+        const user = await this._userRepository.findOne({
             telegramUserId: telegramId,
         });
+
+        return user
     }
 
     async findAll() {
-        return await this._userRepository.find();
+        return await this._userRepository.find({
+            telegramUserId: { $ne: null || undefined },
+        });
     }
 }

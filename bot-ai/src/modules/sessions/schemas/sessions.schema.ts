@@ -20,20 +20,21 @@ export class Session {
     sCopywriting = new CopywritingService().createCopywritingSession()
     sLogin = new LoginSession().createDataSetLogin()
 
-    constructor(id: number, user: User){
+    constructor(id: number, user: User) {
+        console.log(user)
         this.userId = id;
         this.user = user;
-        this.confirmed = user.confirmed;
-        user.confirmed !== false ? this.statusUser = StatusUserBot.REGISTERED_BOT : this.statusUser = StatusUserBot.NOT_REGISTERED
+        this.confirmed = user !== null ? user.confirmed : false;
+        this.confirmed !== false ? this.statusUser = StatusUserBot.REGISTERED_BOT : this.statusUser = StatusUserBot.NOT_REGISTERED
     }
 
-    @Prop({type: mongoose.Schema.Types.ObjectId, ref: "User"})
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: "User" })
     user: User
 
     @Prop({ required: true, default: (`${new Date().getFullYear()}-${new Date().getMonth() + 1}-${new Date().getDate()}`) })
     date: string;
 
-    @Prop({ type: Number, default: Action.DEFAULT})
+    @Prop({ type: Number, default: Action.DEFAULT })
     state: number;
 
     @Prop({ default: false })
@@ -42,7 +43,7 @@ export class Session {
     @Prop({ type: Object })
     copywriting_data = this.sCopywriting;
 
-    @Prop({ type: Number, enum: StatusUserBot})
+    @Prop({ type: Number, enum: StatusUserBot })
     statusUser: number;
 
     @Prop({ type: Number })
@@ -51,7 +52,7 @@ export class Session {
     @Prop({ type: Object })
     stats = this.sStats
 
-    @Prop({type: Object })
+    @Prop({ type: Object })
     login = this.sLogin
 
 }
