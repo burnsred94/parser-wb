@@ -50,9 +50,6 @@ export class AppService {
   async start(@Ctx() ctx: TelegrafContext) {
     const { id, username } = ctx.message ? ctx.message.from : ctx.callbackQuery.from
 
-    const users = await this.userService.findAll()
-    console.log(users)
-
     const findUserTelegram = await this.userService.findByTelegramId(id);
 
     await this.statsService.stats({ start_bot: 1 })
@@ -102,7 +99,7 @@ export class AppService {
         const newSession = await this.sessionService.createSession(session);
 
         const init = await this.initializerService.initStartKeyboard(newSession.statusUser)
-        await this.userService.findByTelegramUserUpdateTelegramId(username, { telegramUserId: id, generateSymbol: 1500 })
+        await this.userService.findByTelegramUserUpdateTelegramId(username, { telegramUserId: id, generateSymbol: 5000 })
 
         if (init) {
           await ctx.reply(init.caption, {

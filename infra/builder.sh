@@ -1,5 +1,5 @@
 #!/bin/sh
-echo "-= SellersHub Image Builder =-"
+echo "-= Image Builder =-"
 
 load_dev_env () {
     PWD_ENV=$PWD/dev
@@ -17,9 +17,17 @@ run_restart_bot_ai (){
     . scripts/restart-bot-ai.sh
 }
 
+run_build_stack () {
+    echo "> Build stack"
+    . dev/build-stack.sh
+    . scripts/restart-stack.sh
+}
+
+
 _PARAM_TARGET=$1
 
 case $_PARAM_TARGET in
   "bot-ai:dev") load_dev_env && run_bot_ai_builder;;
-  "restart:dev") load_dev_env && run_restart_bot_ai;
+  "restart:dev") load_dev_env && run_restart_bot_ai;;
+  "build:stack") load_dev_env && run_build_stack;
 esac
