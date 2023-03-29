@@ -10,11 +10,12 @@ export class Article {
     @Prop()
     article: string;
 
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'SubCategory'})
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Category' })
+    category: Category;
+
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'SubCategory' })
     sub_category: SubCategory;
 
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Category'})
-    category: Category;
 }
 
 

@@ -55,4 +55,4 @@ export interface DataCard {
     data: DataCardRoot,
 }
 
-export type KeyOptimazationData =  Key[][] | [[Key]] | [Keys]
+export type KeyOptimazationData = Key[][] | [[Key]] | [Keys]

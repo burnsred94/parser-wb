@@ -1,6 +1,7 @@
 import { Types } from "mongoose";
+import { CategoriesDocument } from "src/modules/catalog/schemas/category.schemas";
 
-export class DtoParentCategory {
+export class DtoSubCategory {
     name: string;
-    categories: Types.ObjectId;
+    category: CategoriesDocument
 }

@@ -4,12 +4,12 @@ import { readFileSync } from 'fs';
 import { Model } from 'mongoose';
 import { parse } from 'papaparse';
 import { Key } from './intrerfaces/key.interface';
-import { Keys, KeysDocumnet } from './schemas/key.schema';
+import { Keys, KeysDocument } from './schemas/key.schema';
 
 @Injectable()
 export class KeysGeneratorService {
 
-    constructor(@InjectModel(Keys.name) private keysModel: Model<KeysDocumnet>) { }
+    constructor(@InjectModel(Keys.name) private keysModel: Model<KeysDocument>) { }
 
     async generatorKeys(text: string) {
         const record = [];

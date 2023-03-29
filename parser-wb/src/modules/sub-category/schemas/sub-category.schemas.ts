@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 import { Keys } from "src/modules/keys-generator/schemas/key.schema";
 import { Category } from "src/modules/catalog/schemas/category.schemas";
 
-export type SubCategoryDocumnet = mongoose.HydratedDocument<SubCategory>
+export type SubCategoryDocument = mongoose.HydratedDocument<SubCategory>
 
 @Schema()
 export class SubCategory {

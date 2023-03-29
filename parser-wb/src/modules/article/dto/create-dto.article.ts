@@ -1,7 +1,8 @@
-import { Schema, Types } from "mongoose";
+import { Category } from "src/modules/catalog/schemas/category.schemas";
+import { SubCategory } from "src/modules/sub-category/schemas/sub-category.schemas";
 
 export class CreateDtoArticle {
     article: string;
-    category: Types.ObjectId;
-    sub_category: Types.ObjectId;
+    categories: Category;
+    sub_category: SubCategory;
 }
