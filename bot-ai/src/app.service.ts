@@ -1,4 +1,4 @@
-import { Action, Ctx, Message, On, Start, Update, Use } from 'nestjs-telegraf';
+import { Action, Command, Ctx, Message, On, Start, Update, Use } from 'nestjs-telegraf';
 
 import { Action as ActionState, StatusUserBot, TelegrafContext } from './interfaces/telegraf-context.interfaces';
 import { InitializerService } from './modules/initializer/initializer.service';
@@ -37,7 +37,7 @@ export class AppService {
     private readonly validatorService: ValidatorService,
   ) {
     this.configService = new ConfigService();
-    this.bot = new Telegram(this.configService.get('TOKEN_DEV_TELEGRAM'));
+    this.bot = new Telegram(this.configService.get('TOKEN_PROD_TELEGRAM'));
   }
 
   @Use()
@@ -143,7 +143,7 @@ export class AppService {
 
     const findSessionTelegram = await this.sessionService.findOne(id);
 
-    if (findSessionTelegram.state === ActionState.REGISTER) {
+    if (findSessionTelegram?.state !== null && findSessionTelegram?.state === ActionState.REGISTER) {
       try {
         await this.validatorService.validateTypesString(message);
         await this.validatorService.validateEmail(message);
@@ -191,7 +191,7 @@ export class AppService {
       }
     }
 
-    if (findSessionTelegram.state === ActionState.LOGIN) {
+    if (findSessionTelegram?.state !== null && findSessionTelegram?.state === ActionState.LOGIN) {
       try {
         if (!findSessionTelegram.login.tickEmail) {
           await this.validatorService.validateTypesString(message);
@@ -258,7 +258,7 @@ export class AppService {
       }
     }
 
-    if (findSessionTelegram.state === ActionState.AI_COPYWRITER) {
+    if (findSessionTelegram?.state !== null && findSessionTelegram?.state === ActionState.AI_COPYWRITER) {
       try {
         await this.validatorService.validateTypesString(message);
 
@@ -347,10 +347,9 @@ export class AppService {
     }
   }
 
-  @Cron(CronExpression.EVERY_HOUR, { timeZone: 'Europe/Moscow' })
+  @Cron(CronExpression.EVERY_11_HOURS, { timeZone: 'Europe/Moscow' })
   async event() {
     const users = await this.userService.findAll();
-
     const link = path.join(__dirname, '../public/photo_2023-03-29_15-25-52.jpg')
     const sourceImg = fs.createReadStream(link)
 
