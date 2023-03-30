@@ -347,25 +347,25 @@ export class AppService {
     }
   }
 
-  @Cron(CronExpression.EVERY_11_HOURS, { timeZone: 'Europe/Moscow' })
-  async event() {
-    const users = await this.userService.findAll();
-    const link = path.join(__dirname, '../public/photo_2023-03-29_15-25-52.jpg')
-    const sourceImg = fs.createReadStream(link)
+  // @Cron(CronExpression.EVERY_11_HOURS, { timeZone: 'Europe/Moscow' })
+  // async event() {
+  //   const users = await this.userService.findAll();
+  //   const link = path.join(__dirname, '../public/photo_2023-03-29_15-25-52.jpg')
+  //   const sourceImg = fs.createReadStream(link)
 
-    users.map(async (user) => {
-      try {
-        await this.bot.sendPhoto(user.telegramUserId, { source: sourceImg }, {
-          caption: `+100к символов за регистрацию🚀\n\n<a href='https://my-copy.io/'>My copy</a> генерирует за 10 сек. Кто зарегистрируется в течение 24 ч, тому пополним счет на +100к символов🔥\n\nУже 15 виджетов: описания для ВБ, Ozon, Amazon, рерайт, копирайт статей, посты, кликбейт заголовки, сценарии TikTok, YouTube, отзывы, генератор ключевиков, составление плана, списка.\n\nРегистрируйтесь и присылайте свою почту:\n<b>https://t.me/JayPr0</b>`,
-          parse_mode: 'HTML'
-        });
+  //   users.map(async (user) => {
+  //     try {
+  //       await this.bot.sendPhoto(user.telegramUserId, { source: sourceImg }, {
+  //         caption: `+100к символов за регистрацию🚀\n\n<a href='https://my-copy.io/'>My copy</a> генерирует за 10 сек. Кто зарегистрируется в течение 24 ч, тому пополним счет на +100к символов🔥\n\nУже 15 виджетов: описания для ВБ, Ozon, Amazon, рерайт, копирайт статей, посты, кликбейт заголовки, сценарии TikTok, YouTube, отзывы, генератор ключевиков, составление плана, списка.\n\nРегистрируйтесь и присылайте свою почту:\n<b>https://t.me/JayPr0</b>`,
+  //         parse_mode: 'HTML'
+  //       });
 
-      } catch (e) {
-        console.log(e)
-      }
+  //     } catch (e) {
+  //       console.log(e)
+  //     }
 
-    })
-  }
+  //   })
+  // }
 
 
 
