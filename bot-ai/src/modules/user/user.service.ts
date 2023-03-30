@@ -1,7 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { IUser } from './interfaces/interfaces';
 import { User, UserDocument } from './schemas/user.schema';
 
 @Injectable()
@@ -11,7 +10,12 @@ export class UserService {
     ) { }
 
     async create(user: Partial<User>) {
-        return await this._userRepository.create(user);
+        try {
+            console.log(user)
+            return await this._userRepository.create(user);
+        } catch (e) {
+            throw new BadRequestException(e.message)
+        }
     }
 
     async findByTelegram(telegramUser: string) {

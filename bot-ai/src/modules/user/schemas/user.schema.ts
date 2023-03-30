@@ -6,30 +6,30 @@ export type UserDocument = mongoose.HydratedDocument<User>
 
 @Schema()
 export class User {
-    @Prop({type: "string",})
+    @Prop({ type: "string", })
     id: string;
 
-    @Prop({type: "string",})
+    @Prop({ type: "string", })
     username: string;
 
-    @Prop({type: "string"})
+    @Prop({ type: "string" })
     password: string;
 
-    @Prop({type: Number, default: 1500})
+    @Prop({ type: Number, default: 5000 })
     generateSymbol: number;
 
-    @Prop({type: Number})
+    @Prop({ type: Number, unique: true, required: true })
     telegramUserId: number;
 
-    @Prop({type: "string"})
+    @Prop({ type: "string" })
     telegramUser: string;
 
-    @Prop({default: false})
+    @Prop({ default: false })
     confirmed: boolean;
 
-    @Prop({type: 'string'})
+    @Prop({ type: 'string' })
     email: string;
-  
+
     @Prop()
     articles: string[];
 }
