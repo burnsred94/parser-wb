@@ -51,17 +51,18 @@ export class AppService {
     const { id, username } = ctx.message ? ctx.message.from : ctx.callbackQuery.from
 
     const findUserTelegram = await this.userService.findByTelegramId(id);
-
+    console.log(findUserTelegram)
     await this.statsService.stats({ start_bot: 1 })
-
+    console.log('1')
     if (findUserTelegram) {
       const findSessionTelegram = await this.sessionService.findOne(id);
-
+      console.log('2')
       if (findSessionTelegram?.date === this.date && findSessionTelegram !== null) {
+        console.log('3')
         await this.sessionService.findOneAndUpdate(id, {
           copywriting_data: this.copywriting,
         })
-
+        console.log('3')
         const init = await this.initializerService.initStartKeyboard(findSessionTelegram.statusUser)
 
         if (init) {
@@ -76,7 +77,7 @@ export class AppService {
 
       } else if (findSessionTelegram?.date !== this.date && findSessionTelegram !== null) {
         const session = new Session(id, findUserTelegram);
-
+        console.log('3')
         findSessionTelegram ?
           await this.sessionService.delete(id) && await this.sessionService.createSession(session) :
           await this.sessionService.createSession(session)
