@@ -1,4 +1,4 @@
-import { Action, Command, Ctx, Message, On, Start, Update, Use } from 'nestjs-telegraf';
+import { Action, Ctx, Message, On, Start, Update, Use } from 'nestjs-telegraf';
 
 import { Action as ActionState, StatusUserBot, TelegrafContext } from './interfaces/telegraf-context.interfaces';
 import { InitializerService } from './modules/initializer/initializer.service';
@@ -11,11 +11,8 @@ import { CopywritingService } from './modules/sessions/schemas/copywrite-data.sc
 import { ValidatorService } from './modules/validator/validator.service';
 import { SessionStats } from './modules/sessions/schemas/sessions-stats.schema';
 import { LoginSession } from './modules/sessions/schemas/session-login.schema';
-import { Cron, CronExpression } from '@nestjs/schedule';
 import { ConfigService } from '@nestjs/config';
 import { Telegram } from 'telegraf';
-import * as path from 'path';
-import * as fs from 'fs';
 
 
 

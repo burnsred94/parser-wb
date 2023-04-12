@@ -1,19 +1,6 @@
 version: "3"
 services:
 
-  nestjs-api:
-    container_name: parser
-    build:
-      context: ./parser-wb
-    restart: always
-    env_file:
-      - ./parser-wb/.env
-    volumes:
-      - ./parser-wb:/usr/src/app
-      - /usr/src/app/node_modules
-    ports:
-      - "3000:3000"
-
   bot-ai:
     container_name: bot-ai
     build:
@@ -34,7 +21,7 @@ services:
     restart: always
     hostname: mongo
     env_file:
-      - ./parser-wb/.env
+      - ./bot-ai/.env
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
