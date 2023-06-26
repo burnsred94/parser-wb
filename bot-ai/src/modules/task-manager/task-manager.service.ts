@@ -52,7 +52,7 @@ export class TaskManagerService {
 
     constructor(private readonly userService: UserService) {
         this.configService = new ConfigService();
-        this.bot = new Telegram(this.configService.get('TOKEN_DEV_TELEGRAM'));
+        this.bot = new Telegram(this.configService.get('TOKEN_PROD_TELEGRAM'));
     }
 
 

@@ -37,7 +37,7 @@ export class AppService {
     private readonly validatorService: ValidatorService,
   ) {
     this.configService = new ConfigService();
-    this.bot = new Telegram(this.configService.get('TOKEN_DEV_TELEGRAM'));
+    this.bot = new Telegram(this.configService.get('TOKEN_PROD_TELEGRAM'));
   }
 
   @Use()
