@@ -66,14 +66,19 @@ export class InitializerService {
 
     async getAiDataBot(data: CopywritingData, id) {
         const url_ai = await this.configService.get('API_AI_BOT')
-
-        const response = await axios.post(`${url_ai}`, {
-            data: {
-                product_name: data.name,
-                short_description: data.description,
-                keywords: data.keywords
+        console.log(data)
+        const response = await axios.post(`${url_ai}`,
+            {
+                service: 4,
+                text: data.description,
+                keys: data.keywords
+            },
+            {
+                headers: {
+                    "Authorization": "Bearer " + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MzEzLCJpYXQiOjE2ODcxNzc5ODQsImV4cCI6MTY4OTc2OTk4NH0.JdO3tv8kftx7E2DyiNyaQnupRMYiMmV2Anare_027PI"
+                }
             }
-        }).catch((err: AxiosError) => {
+        ).catch((err: AxiosError) => {
             throw new BadRequestException('К сожалению мы не смогли сгенирировать текст\n\nПопробуйте позже')
         }).then((res: AxiosResponse) => {
             console.log(id)

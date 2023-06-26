@@ -13,6 +13,9 @@ import { SessionStats } from './modules/sessions/schemas/sessions-stats.schema';
 import { LoginSession } from './modules/sessions/schemas/session-login.schema';
 import { ConfigService } from '@nestjs/config';
 import { Telegram } from 'telegraf';
+import { Cron, CronExpression } from '@nestjs/schedule';
+import path, { join } from 'path';
+import * as fs from 'node:fs';
 
 
 
@@ -34,7 +37,7 @@ export class AppService {
     private readonly validatorService: ValidatorService,
   ) {
     this.configService = new ConfigService();
-    this.bot = new Telegram(this.configService.get('TOKEN_PROD_TELEGRAM'));
+    this.bot = new Telegram(this.configService.get('TOKEN_DEV_TELEGRAM'));
   }
 
   @Use()
@@ -345,25 +348,25 @@ export class AppService {
     }
   }
 
-  // @Cron(CronExpression.EVERY_11_HOURS, { timeZone: 'Europe/Moscow' })
-  // async event() {
-  //   const users = await this.userService.findAll();
-  //   const link = path.join(__dirname, '../public/photo_2023-03-29_15-25-52.jpg')
-  //   const sourceImg = fs.createReadStream(link)
+  @Cron(CronExpression.EVERY_HOUR, { timeZone: 'Europe/Moscow' })
+  async event() {
+    const users = await this.userService.findAll();
+    const link = join(__dirname, '../public/photo_2023-06-22_10-08-50.jpg')
+    const sourceImg = fs.createReadStream(link)
 
-  //   users.map(async (user) => {
-  //     try {
-  //       await this.bot.sendPhoto(user.telegramUserId, { source: sourceImg }, {
-  //         caption: `+100к символов за регистрацию🚀\n\n<a href='https://my-copy.io/'>My copy</a> генерирует за 10 сек. Кто зарегистрируется в течение 24 ч, тому пополним счет на +100к символов🔥\n\nУже 15 виджетов: описания для ВБ, Ozon, Amazon, рерайт, копирайт статей, посты, кликбейт заголовки, сценарии TikTok, YouTube, отзывы, генератор ключевиков, составление плана, списка.\n\nРегистрируйтесь и присылайте свою почту:\n<b>https://t.me/JayPr0</b>`,
-  //         parse_mode: 'HTML'
-  //       });
+    users.map(async (user) => {
+      try {
+        await this.bot.sendPhoto(user.telegramUserId, { source: sourceImg }, {
+          caption: `<b>AI-копирайтер и 15 его модулей теперь на сайте</b> 🚀\n\nПользуйтесь бесплатно на  <a href='https://sellershub.ru/soft/ii-servisy/?utm_medium=smm&utm_source=tg&utm_campaign=post_tg_ai&utm_term=ai_servicy&utm_content=1'>sellershub.ru</a> Доступен раздел ИИ-сервисы с полезными фишками для ведения бизнеса и не только\n\n<b>▪️5 уникальных инструментов для работы на маркетплейсе</b>\n\nСоздавайте продающие описания товаров на Wildberries, Ozon и Amazon за 10 секунд! Достаньте ключи из описаний конкурентов через экстрактор ключевых слов или напишите новый текст по самым популярным вхождениям.\n\n<b>▪️4 эффективных помощника для ведения соцсетей</b>\n\nПродвигаться и продавать в социальных сетях стало еще проще! Генерируйте посты для телеграм-канала, сценарии для YouTube и кликбейт-заголовки TikTok.\n\n<b>▪️6 крутых сервисов для решения повседневных задач</b>\n\nДелегируйте рутину и освобождайте время. ИИ-помощники составят план, список дел, подготовят отзывы о вашем товаре и даже напишут увлекательную статью.\n\nПереходите по ссылке <a href='https://sellershub.ru/soft/ii-servisy/?utm_medium=smm&utm_source=tg&utm_campaign=post_tg_ai&utm_term=ai_servicy&utm_content=1'>ссылке</a> и тестируйте уникальные инструменты🔥`,
+          parse_mode: 'HTML'
+        });
 
-  //     } catch (e) {
-  //       console.log(e)
-  //     }
+      } catch (e) {
+        console.log(e)
+      }
 
-  //   })
-  // }
+    })
+  }
 
 
 

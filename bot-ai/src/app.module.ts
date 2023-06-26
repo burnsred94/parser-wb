@@ -29,7 +29,7 @@ import { NotAccess } from './actions/action-not-access';
   imports: [
     ScheduleModule.forRoot(),
     TelegrafModule.forRoot({
-      token: '6054044696:AAFGvQUnf1ka-lSDRiM1CY0Y_Cy6VymwBA0',
+      token: '6230430443:AAGoS3eiv1PEIpoJBHZskL6A5y0ZU375Abs',
     }),
     ConfigModule.forRoot({
       isGlobal: true,
